@@ -3,6 +3,8 @@ A Twitter client app for Fitbit OS
 
 ![screenshot-fitbit-twitter.png](./screenshot-fitbit-twitter.png)
 
+Downloadable from Fitbit App Gallary at [https://gam.fitbit.com/gallery/app/3344bcba-4f57-4b62-b6de-44c49fcab89d](https://gam.fitbit.com/gallery/app/3344bcba-4f57-4b62-b6de-44c49fcab89d)
+
 # Prerequisites
 
 - [Register](https://developer.twitter.com) a Twitter developer account at 
@@ -11,7 +13,7 @@ A Twitter client app for Fitbit OS
 
 # Getting started
 
-First donwload and install the npm dependencies
+First download and install the npm dependencies
 
 ```
 $ npm install
@@ -22,7 +24,7 @@ Then login to your Fitbit development account
 $ npx fitbit
 ```
 
-Build and install
+Build and install!
 ```
 fitbit$ build-and-install
 ```
