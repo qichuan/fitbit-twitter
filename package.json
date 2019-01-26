@@ -1,0 +1,34 @@
+{
+  "name": "fitbit-twitter",
+  "version": "0.1.0",
+  "private": true,
+  "license": "UNLICENSED",
+  "devDependencies": {
+    "@fitbit/sdk": "~3.0.0",
+    "@fitbit/sdk-cli": "^1.5.0"
+  },
+  "fitbit": {
+    "appUUID": "3344bcba-4f57-4b62-b6de-44c49fcab89d",
+    "appType": "app",
+    "appDisplayName": "TweetFit",
+    "iconFile": "resources/icon.png",
+    "wipeColor": "#ffffff",
+    "requestedPermissions": [
+      "access_internet",
+      "run_background"
+    ],
+    "buildTargets": [
+      "higgs",
+      "meson"
+    ],
+    "i18n": {},
+    "defaultLanguage": "en-US"
+  },
+  "scripts": {
+    "build": "fitbit-build",
+    "debug": "fitbit"
+  },
+  "dependencies": {
+    "fitbit-google-analytics": "^1.1.0"
+  }
+}
