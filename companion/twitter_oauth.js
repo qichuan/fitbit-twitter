@@ -2,7 +2,7 @@
 import {settingsStorage} from "settings";
 import {jsSHA} from "./sha1";
 import {consumerKey, consumerSecret} from "./common";
-
+import {Base64} from "./base64";
 
 /**
  * For Request Token
@@ -14,7 +14,7 @@ function getAuthorizationForRequestToken(httpMethod, baseUrl, fitbitAppCallback)
     // timestamp as unix epoch
     let timestamp = Math.round(Date.now() / 1000);
     // nonce as base64 encoded unique random string
-    let nonce = btoa(consumerKey + ':' + timestamp);
+    let nonce = Base64.btoa(consumerKey + ':' + timestamp);
     let callback = encodeURIComponent(`https://app-settings.fitbitdevelopercontent.com/simple-redirect.html?state=${encodeURIComponent(fitbitAppCallback)}`);
     // generate signature from base string & signing key
     let baseString = oAuthBaseStringForRequestToken(httpMethod, baseUrl, consumerKey, timestamp, nonce, callback);
@@ -59,7 +59,7 @@ function getAuthorizationForAccessToken(httpMethod, baseUrl, requestToken, verif
 
     let timestamp = Math.round(Date.now() / 1000);
     // nonce as base64 encoded unique random string
-    let nonce = btoa(consumerKey + ':' + timestamp);
+    let nonce = Base64.btoa(consumerKey + ':' + timestamp);
     // generate signature from base string & signing key
     let baseString = oAuthBaseStringForAccessToken(httpMethod, baseUrl, consumerKey, timestamp.nonce, requestToken, verifier);
     let signingKey = oAuthSigningKey(consumerSecret);
@@ -106,7 +106,7 @@ function getAuthorizationForProtectedResource(httpMethod, baseUrl) {
     // timestamp as unix epoch
     let timestamp = Math.round(Date.now() / 1000);
     // nonce as base64 encoded unique random string
-    let nonce = btoa(consumerKey + ':' + timestamp);
+    let nonce = Base64.btoa(consumerKey + ':' + timestamp);
     let accessToken = settingsStorage.getItem('oauth_access_token');
     let accessTokenSecret = settingsStorage.getItem('oauth_access_token_secret');
 
