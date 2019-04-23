@@ -19,7 +19,8 @@
     ],
     "buildTargets": [
       "higgs",
-      "meson"
+      "meson",
+      "gemini"
     ],
     "i18n": {},
     "defaultLanguage": "en-US"
