@@ -31,6 +31,10 @@ function settingsComponent(props) {
                         
                         // Do not open webpage
                     }}
+                    onReturn={async (query) => {
+                        let parameters = utils.queryStringToObject(query);
+                        props.settingsStorage.setItem("oauth_verifier", parameters["oauth_verifier"]);
+                    }}
                 />
                 <Webconfig
                     label={<Text bold>{props.settingsStorage.getItem('oauth_request_token').length === 0 ? '...' : 'Now Click Me'}</Text>}
@@ -45,7 +49,7 @@ function settingsComponent(props) {
                         // Use the oauth_request_token to open the authenticate page
                         return `https://api.twitter.com/oauth/authenticate?oauth_token=${token}`;
                     }}
-                    onReturn={(query) => {
+                    onReturn={async (query) => {
                         let parameters = utils.queryStringToObject(query);
                         props.settingsStorage.setItem("oauth_verifier", parameters["oauth_verifier"]);
                     }}
