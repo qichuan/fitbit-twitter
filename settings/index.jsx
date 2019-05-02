@@ -24,7 +24,8 @@ function settingsComponent(props) {
                     label={<Text bold>Click Me First</Text>}
                     status={''}
                     constructUrl={async (returnUrl, callbackUrl) => {
-                        // Clear the oauth_request_token
+                        // Clear the callbackUrl and oauth_request_token
+                        props.settingsStorage.setItem("callbackUrl", '');
                         props.settingsStorage.setItem('oauth_request_token', '');
                         // Set the callbackUrl, the companion will call request token API
                         props.settingsStorage.setItem("callbackUrl", callbackUrl);
