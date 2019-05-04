@@ -136,7 +136,7 @@ const listDelegate = {
         if (info.type == "my-pool") {
             if (info.value) {
                 tile.getElementById("text").text = info.value.text;
-                tile.getElementById("author").text = `@${info.value.author} · ${utils.prettyDate(info.value.createdTime)}`;
+                tile.getElementById("author").text = `❤️ ${info.value.likes} @${info.value.author} · ${utils.prettyDate(info.value.createdTime)}`;
             }
             // Reserve for future use
             let touch = tile.getElementById("touch-me");

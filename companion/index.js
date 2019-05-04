@@ -139,7 +139,8 @@ function processHomeTimelineResult(jsonText) {
             return {
                 text: sanitizedText,
                 createdTime: createdTime,
-                author: tweet.user.screen_name
+                author: tweet.user.screen_name,
+                likes: tweet.favorite_count
             }
         });
         // Transfer the tweets to the app
