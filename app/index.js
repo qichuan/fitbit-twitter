@@ -138,7 +138,7 @@ const listDelegate = {
                 tile.getElementById("avatar").image = `/private/data/${info.value.author}.jpg`;
                 tile.getElementById("fullname").text = info.value.fullName;
                 tile.getElementById("author").text = `@${info.value.author}`;
-                //tile.getElementById("author").text = `❤️ ${info.value.likes} @${info.value.author} · ${utils.prettyDate(info.value.createdTime)}`;
+                tile.getElementById("footer").text = `❤️ ${info.value.likes} · ${utils.prettyDate(info.value.createdTime)}`;
                 tile.getElementById("text").text = info.value.text;
             }
             // Reserve for future use

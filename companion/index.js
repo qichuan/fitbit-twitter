@@ -126,12 +126,14 @@ function processHomeTimelineResult(jsonText) {
         console.log(`${fullTweets.length} tweets received`);
         const simpleTweets = fullTweets.map((tweet, index) => {
             // Some unicode characters are not displayable in Fitbit devices, so we need to santize the text here
-            const sanitizedText = tweet.text.split('').map(function (value, index) {
+            let sanitizedText = tweet.text.split('').map(function (value, index) {
                 if (value.charCodeAt(0) >= 55300) {
                     return ' ';
                 }
                 return value;
             }).join('');
+
+            sanitizedText = sanitizedText.substring(0, sanitizedText.indexOf('https://t.co/'));
 
             // Convert the date string to time long value
             const createdTime = new Date((tweet.created_at || "").replace(/-/g,"/")

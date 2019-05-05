@@ -13,6 +13,9 @@
       <!-- The tweet text -->
       <textarea id="text" />
 
+      <!-- The footer text -->
+      <text id="footer" class="footer" />
+
       <!-- The divider -->
       <rect id="tile-divider-bottom" class="tile-divider-bottom" />
       <!-- Reserve the touch event for future use -->
