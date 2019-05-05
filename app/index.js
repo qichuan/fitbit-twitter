@@ -135,8 +135,11 @@ const listDelegate = {
     configureTile: function (tile, info) {
         if (info.type == "my-pool") {
             if (info.value) {
+                tile.getElementById("avatar").image = `/private/data/${info.value.author}.jpg`;
+                tile.getElementById("fullname").text = info.value.fullName;
+                tile.getElementById("author").text = `@${info.value.author}`;
+                //tile.getElementById("author").text = `❤️ ${info.value.likes} @${info.value.author} · ${utils.prettyDate(info.value.createdTime)}`;
                 tile.getElementById("text").text = info.value.text;
-                tile.getElementById("author").text = `❤️ ${info.value.likes} @${info.value.author} · ${utils.prettyDate(info.value.createdTime)}`;
             }
             // Reserve for future use
             let touch = tile.getElementById("touch-me");
