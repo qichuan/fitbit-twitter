@@ -91,6 +91,9 @@ function loadTweets() {
     let isUserLoggedIn = false;
     if (settingsStorage.getItem('oauth_access_token')) {
         isUserLoggedIn = true;
+    }  else {
+        // clear local storage
+        localStorage.clear();
     }
 
     console.log('Login status ' + isUserLoggedIn);
@@ -135,14 +138,22 @@ function processHomeTimelineResult(jsonText) {
 
             sanitizedText = sanitizedText.substring(0, sanitizedText.indexOf('https://t.co/'));
 
+            // Load the media image
+            // if (tweet.entities.media) {
+            //     fetchAndTranferImageFile(tweet.entities.media[0].media_url_https+':thumb', tweet.id + '.jpg');
+            // }
+
             // Convert the date string to time long value
             const createdTime = new Date((tweet.created_at || "").replace(/-/g,"/")
                                 .replace(/[TZ]/g," ")).getTime();
+
+            // Load the avatar image
             fetchAndTranferImageFile(
                 tweet.user.profile_image_url_https,
-                `${tweet.user.screen_name}.jpg`);
+                `avatar_${tweet.user.screen_name}.jpg`);
             // Return only the necessary data to app
             return {
+                id: tweet.id,
                 text: sanitizedText,
                 createdTime: createdTime,
                 author: tweet.user.screen_name,
