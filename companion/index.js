@@ -136,7 +136,10 @@ function processHomeTimelineResult(jsonText) {
                 return value;
             }).join('');
 
-            sanitizedText = sanitizedText.substring(0, sanitizedText.indexOf('https://t.co/'));
+            const found = sanitizedText.indexOf('https://t.co/');
+            if (found > 0) {
+                sanitizedText = sanitizedText.substring(0, found);
+            }
 
             // Load the media image
             // if (tweet.entities.media) {
@@ -148,7 +151,7 @@ function processHomeTimelineResult(jsonText) {
                                 .replace(/[TZ]/g," ")).getTime();
 
             // Load the avatar image
-            fetchAndTranferImageFile(
+            fetchAndTransferImageFile(
                 tweet.user.profile_image_url_https,
                 `avatar_${tweet.user.screen_name}.jpg`);
             // Return only the necessary data to app
@@ -166,8 +169,8 @@ function processHomeTimelineResult(jsonText) {
     }
 }
 
-function fetchAndTranferImageFile(imageUrl, destFilename) {
-    // Do not fetch if the image has alraedy been fetched before
+function fetchAndTransferImageFile(imageUrl, destFilename) {
+    // Do not fetch if the image has already been fetched before
     if (localStorage.getItem(destFilename)) {
         return;
     }
