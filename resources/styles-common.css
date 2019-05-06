@@ -17,6 +17,7 @@
 .fullname {
   x: 55;
   y: 25;
+  width: 100%;
   font-size: 24;
   fill: white;
   text-length: 64;
@@ -27,7 +28,7 @@
 .author {
   x: 55;
   y: 45;
-  weight: 100%-10;
+  width: 100%;
   font-size: 22;
   fill: white;
   text-length: 64;
@@ -36,8 +37,8 @@
 
 .tile-list-item textarea {
   x: 5;
-  y: 55;
-  weight: 100%-10;
+  y: 65;
+  width: 100%-10;
   font-size: 26;
   fill: white;
   text-length: 256;
@@ -46,7 +47,7 @@
 .footer {
   x: 100%-5;
   y: 100%-24;
-  weight: 100%-10;
+  width: 100%-10;
   font-size: 24;
   fill: white;
   text-length: 64;
