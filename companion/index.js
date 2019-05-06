@@ -3,6 +3,8 @@ import {settingsStorage} from "settings"
 import {outbox} from "file-transfer";
 import cbor from "cbor";
 import * as messaging from "messaging";
+import { Image } from "image";
+import { localStorage } from "local-storage";
 
 // Import external 3rd party library
 import "fitbit-google-analytics/companion"
@@ -89,6 +91,9 @@ function loadTweets() {
     let isUserLoggedIn = false;
     if (settingsStorage.getItem('oauth_access_token')) {
         isUserLoggedIn = true;
+    }  else {
+        // clear local storage
+        localStorage.clear();
     }
 
     console.log('Login status ' + isUserLoggedIn);
@@ -124,27 +129,70 @@ function processHomeTimelineResult(jsonText) {
         console.log(`${fullTweets.length} tweets received`);
         const simpleTweets = fullTweets.map((tweet, index) => {
             // Some unicode characters are not displayable in Fitbit devices, so we need to santize the text here
-            const sanitizedText = tweet.text.split('').map(function (value, index) {
+            let sanitizedText = tweet.text.split('').map(function (value, index) {
                 if (value.charCodeAt(0) >= 55300) {
                     return ' ';
                 }
                 return value;
             }).join('');
 
+            sanitizedText = sanitizedText.substring(0, sanitizedText.indexOf('https://t.co/'));
+
+            // Load the media image
+            // if (tweet.entities.media) {
+            //     fetchAndTranferImageFile(tweet.entities.media[0].media_url_https+':thumb', tweet.id + '.jpg');
+            // }
+
             // Convert the date string to time long value
             const createdTime = new Date((tweet.created_at || "").replace(/-/g,"/")
                                 .replace(/[TZ]/g," ")).getTime();
 
+            // Load the avatar image
+            fetchAndTranferImageFile(
+                tweet.user.profile_image_url_https,
+                `avatar_${tweet.user.screen_name}.jpg`);
             // Return only the necessary data to app
             return {
+                id: tweet.id,
                 text: sanitizedText,
                 createdTime: createdTime,
-                author: tweet.user.screen_name
+                author: tweet.user.screen_name,
+                fullName: tweet.user.name,
+                likes: tweet.favorite_count,
             }
         });
         // Transfer the tweets to the app
         outbox.enqueue(FILE_NAME, cbor.encode(simpleTweets));
     }
+}
+
+function fetchAndTranferImageFile(imageUrl, destFilename) {
+    // Do not fetch if the image has alraedy been fetched before
+    if (localStorage.getItem(destFilename)) {
+        return;
+    }
+    localStorage.setItem(destFilename, true);
+    // Fetch the image from the internet
+    fetch(imageUrl).then(function (response) {
+        // We need an arrayBuffer of the file contents
+        return response.arrayBuffer();
+    }).then(buffer => Image.from(buffer, "image/jpeg"))
+    .then(image =>
+      image.export("image/jpeg", {
+        background: "#FFFFFF"
+      })
+    ).then(function (data) {
+        // Queue the file for transfer
+        outbox.enqueue(destFilename, data).then(function (ft) {
+        // Queued successfully
+        console.log("Transfer of '" + destFilename + "' successfully queued.");
+    }).catch(function (error) {
+        // Failed to queue
+        throw new Error("Failed to queue '" + destFilename + "'. Error: " + error);
+    });}).catch(function (error) {
+        // Log the error
+        console.log("Failure: " + error);
+    });
 }
 
 /**

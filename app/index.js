@@ -3,6 +3,7 @@ import document from "document";
 import * as messaging from "messaging";
 import {inbox} from "file-transfer";
 import fs from "fs";
+import { listDirSync } from "fs";
 
 // Import external 3rd party library
 import analytics from "fitbit-google-analytics/app"
@@ -82,12 +83,21 @@ messaging.peerSocket.onmessage = function (evt) {
             welcomeLine2.style.visibility = "visible";
             list.style.visibility = "hidden";
 
-            // Delete the tweets file
-            try {
-                fs.unlinkSync("tweets.cbor");
-            }catch (e) {
-                // ignore
-                console.log("delete file error");
+            // Delete tweets file and all avatar files
+            const listDir = fs.listDirSync("/private/data");
+            let dirIter;
+            while((dirIter = listDir.next()) && !dirIter.done) {
+                const filename = dirIter.value;
+                if ( "tweets.cbor" === filename || 0 === filename.indexOf("avatar_")) {
+                    try {
+                        fs.unlinkSync(filename);
+                        console.log("Successfully deleted file " + filename);
+                    }
+                    catch (e) {
+                        // ignore
+                        console.log("Delete file error " + e);
+                    }
+                }
             }
         }
     } else if (message.what === 'spinner') {
@@ -135,8 +145,11 @@ const listDelegate = {
     configureTile: function (tile, info) {
         if (info.type == "my-pool") {
             if (info.value) {
+                tile.getElementById("avatar").image = `/private/data/avatar_${info.value.author}.jpg`;
+                tile.getElementById("fullname").text = info.value.fullName;
+                tile.getElementById("author").text = `@${info.value.author}`;
+                tile.getElementById("footer").text = `❤️ ${info.value.likes} · ${utils.prettyDate(info.value.createdTime)}`;
                 tile.getElementById("text").text = info.value.text;
-                tile.getElementById("author").text = `@${info.value.author} · ${utils.prettyDate(info.value.createdTime)}`;
             }
             // Reserve for future use
             let touch = tile.getElementById("touch-me");

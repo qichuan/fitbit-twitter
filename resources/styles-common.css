@@ -1,31 +1,58 @@
 .welcome {
-    x: 50%;
-    y: 50%;
-    fill: white;
-    font-size: 24;
-    text-anchor: middle;
-    visibility: hidden;
-  }
+  x: 50%;
+  y: 50%;
+  fill: white;
+  font-size: 24;
+  text-anchor: middle;
+  visibility: hidden;
+}
+
+.avatar {
+  x: 5;
+  y: 5;
+  width: 46;
+  height: 46;
+}
+
+.fullname {
+  x: 55;
+  y: 25;
+  font-size: 24;
+  fill: white;
+  text-length: 64;
+  font-weight: bold;
+  text-anchor: start;
+}
   
-  .tile-list-item textarea {
-    x: 5;
-    y: 5;
-    weight: 100%-10;
-    font-size: 26;
-    fill: white;
-    text-length: 256;
-  }
+.author {
+  x: 55;
+  y: 45;
+  weight: 100%-10;
+  font-size: 22;
+  fill: white;
+  text-length: 64;
+  text-anchor: start;
+}
+
+.tile-list-item textarea {
+  x: 5;
+  y: 55;
+  weight: 100%-10;
+  font-size: 26;
+  fill: white;
+  text-length: 256;
+}
+
+.footer {
+  x: 100%-5;
+  y: 100%-24;
+  weight: 100%-10;
+  font-size: 24;
+  fill: white;
+  text-length: 64;
+  text-anchor: end;
+}
   
-  .author {
-    x: 100%-5;
-    y: 100%-24;
-    weight: 100%-10;
-    font-size: 24;
-    fill: white;
-    text-length: 64;
-    text-anchor: end;
-  }
+.tile-divider-bottom { x: 0; y: 100%-10; width: 100%; height: 2; fill: #76ECFE; }
   
-  .tile-divider-bottom { x: 0; y: 100%-10; width: 100%; height: 2; fill: #76ECFE; }
-  
-  #spinner { x: 50%-25; y: 50%-25; width: 50; height: 50; fill: fb-white; }
+#spinner { x: 50%-25; y: 50%-25; width: 50; height: 50; fill: fb-white; }

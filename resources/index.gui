@@ -3,10 +3,19 @@
     <!-- Define the title list item -->
     <symbol id="my-tile-item" href="#tile-list-item" focusable="false"
             pointer-events="none" system-events="all" display="none">
-      <!-- The tweet text -->
-      <textarea id="text" />
+      <!-- The avatar text -->
+      <image id="avatar" class="avatar"/>
+      <!-- The full name -->
+      <text id="fullname" class="fullname" />
       <!-- The author text -->
       <text id="author" class="author" />
+
+      <!-- The tweet text -->
+      <textarea id="text" />
+
+      <!-- The footer text -->
+      <text id="footer" class="footer" />
+
       <!-- The divider -->
       <rect id="tile-divider-bottom" class="tile-divider-bottom" />
       <!-- Reserve the touch event for future use -->
