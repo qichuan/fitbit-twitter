@@ -29,8 +29,15 @@ function getRequestToken() {
 // START OF EVENT TRIGGER CALLBACK IMPLEMENTATION
 /////////////////////////////////////////////////
 settingsStorage.onchange = function (evt) {
+    if (evt.key === 'settingsPageOpened') {
+        console.log('Setting page is opened');
+        // If the request token is not available, request one
+        if (!isUserLoggedIn()) {   
+            getRequestToken();
+        }
+    }
     // When logout button is clicked 
-    if (evt.key === 'invokeLogout') {
+    else if (evt.key === 'invokeLogout') {
         console.log('Logout button is clicked');
         settingsStorage.setItem("oauth_access_token", "");
         settingsStorage.setItem("oauth_access_token_secret", "");
@@ -78,11 +85,6 @@ messaging.peerSocket.onmessage = function (evt) {
     // The app is ready
     if (message.what === 'appReady') {
         console.log('The device is ready');
-        // If the request token is not available, request one
-        if (!isUserLoggedIn()) {   
-            getRequestToken();
-        }
-
         loadTweets();
     }
 };

@@ -1,6 +1,14 @@
 import {utils} from "../common/utils";
 
+console.log('Settings page');
+let settingsPageOpened = false;
+
 function settingsComponent(props) {
+    if (!settingsPageOpened) {
+        console.log('Tell companion that settings page is opened');
+        props.settingsStorage.setItem('settingsPageOpened', new Date().getMilliseconds() + '');
+        settingsPageOpened = true;
+    }
     return (
         <Page>
             <Section
@@ -48,4 +56,4 @@ function settingsComponent(props) {
     );
 }
 
-registerSettingsPage(settingsComponent);
+const result = registerSettingsPage(settingsComponent);
