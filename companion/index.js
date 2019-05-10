@@ -5,6 +5,7 @@ import cbor from "cbor";
 import * as messaging from "messaging";
 import { Image } from "image";
 import { localStorage } from "local-storage";
+import { me } from "companion";
 
 // Import external 3rd party library
 import "fitbit-google-analytics/companion"
@@ -14,25 +15,32 @@ import {twitterApi} from "./twitter_api";
 
 const FILE_NAME = "tweets.cbor";
 
-// Reset oauth_request_token and callbackUrl
-settingsStorage.setItem('oauth_request_token', '');
-settingsStorage.setItem('callbackUrl', '');
+function getRequestToken() {
+    const callbackUrl = "fitbit://gallery/webconfig/3344bcba-4f57-4b62-b6de-44c49fcab89d/" + me.buildId;
+    twitterApi.getRequestToken(callbackUrl, function (token) {
+        if (token) {
+            console.log("found request token " + token);
+            settingsStorage.setItem("oauth_request_token", token);
+        }
+    });
+}
 
 /////////////////////////////////////////////////
 // START OF EVENT TRIGGER CALLBACK IMPLEMENTATION
 /////////////////////////////////////////////////
 settingsStorage.onchange = function (evt) {
-    // Call the request token API when a new callbackUrl event arrives
-    if (evt.key === 'callbackUrl') {
-        const newCallbackUrl = evt.newValue;
-        if (newCallbackUrl.length === 0) {
-            return;
-        }
-        twitterApi.getRequestToken(newCallbackUrl, function (token) {
-            if (token) {
-                console.log("found request token " + token);
-                settingsStorage.setItem("oauth_request_token", token);
-            }
+    // When logout button is clicked 
+    if (evt.key === 'invokeLogout') {
+        console.log('Logout button is clicked');
+        settingsStorage.setItem("oauth_access_token", "");
+        settingsStorage.setItem("oauth_access_token_secret", "");
+        getRequestToken();
+
+        localStorage.clear();
+
+        send({
+            what: 'loginStatus',
+            data: false
         });
 
     // Call the access token API when a new oauth verifier event arrives
@@ -58,7 +66,7 @@ settingsStorage.onchange = function (evt) {
         // Reset the oauth_request_token;
         settingsStorage.setItem('oauth_request_token', '');
     } else if (evt.key === 'oauth_access_token') {
-        loadTweets();
+        // loadTweets();
     }
 };
 
@@ -69,6 +77,12 @@ messaging.peerSocket.onmessage = function (evt) {
 
     // The app is ready
     if (message.what === 'appReady') {
+        console.log('The device is ready');
+        // If the request token is not available, request one
+        if (!isUserLoggedIn()) {   
+            getRequestToken();
+        }
+
         loadTweets();
     }
 };
@@ -76,6 +90,11 @@ messaging.peerSocket.onmessage = function (evt) {
 /////////////////////////////////////////////////
 // END OF EVENT TRIGGER CALLBACK IMPLEMENTATION
 /////////////////////////////////////////////////
+
+function isUserLoggedIn() {
+    return settingsStorage.getItem('oauth_access_token') != null
+                                && settingsStorage.getItem('oauth_access_token').length > 0
+}
 
 /**
  * Load the Tweets from server
@@ -85,27 +104,21 @@ function loadTweets() {
     send({
         what: 'spinner',
         data: true
-    })
+    });
 
     // Get user login status
-    let isUserLoggedIn = false;
-    if (settingsStorage.getItem('oauth_access_token')) {
-        isUserLoggedIn = true;
-    }  else {
-        // clear local storage
-        localStorage.clear();
-    }
+    const loggedIn = isUserLoggedIn();
 
-    console.log('Login status ' + isUserLoggedIn);
+    console.log('Login status ' + loggedIn);
 
     // Tell app the login status
     send({
         what: 'loginStatus',
-        data: isUserLoggedIn
+        data: loggedIn
     });
 
     // If user has already logged in, retrieve the current home timeline
-    if (isUserLoggedIn) {
+    if (loggedIn) {
         twitterApi.getHomeTimeline(processHomeTimelineResult);
     } else {
         // Tell app to hide the spinner
