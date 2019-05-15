@@ -17,6 +17,20 @@ function setWebConfigRef(element) {
           
 function settingsComponent(props) {
     myProps = props;
+
+    const requestTokenNotEmpty = props.settingsStorage.getItem('oauth_request_token') != null && props.settingsStorage.getItem('oauth_request_token').length > 0;
+    const accessTokenNotEmpty = props.settingsStorage.getItem('oauth_access_token') != null && props.settingsStorage.getItem('oauth_access_token').length > 0;
+    let status = 'Please Wait...';
+    if (accessTokenNotEmpty) {
+        status = 'Logged in successfully :)';
+    } else {
+        if (requestTokenNotEmpty) {
+            status = ''
+        } else {
+            status = 'Please Wait...';
+        }
+    }
+    
     return (
         <Page>
             <Section
@@ -26,21 +40,20 @@ function settingsComponent(props) {
                     </Text>}>
                 <Webconfig
                     ref={setWebConfigRef}
-                    label={<Text bold>{!props.settingsStorage.getItem('oauth_access_token') || props.settingsStorage.getItem('oauth_access_token').length === 0 ? 'Login' : 'Logged in successfully :)'}</Text>}
-                    status={''}
+                    label={<Text bold>{'Login'}</Text>}
+                    status={status}
                     constructUrl={(returnUrl, callbackUrl) => {
-                        console.log(callbackUrl);
                         const requestToken = props.settingsStorage.getItem('oauth_request_token');
-                        const accessToken = props.settingsStorage.getItem('oauth_access_token');
 
                         // Do not open page if no oauth_request_token available;
-                        if (requestToken.length === 0 || accessToken.length > 0) {
+                        if (!requestTokenNotEmpty || accessTokenNotEmpty) {
                             return '';
                         }
                         // Use the oauth_request_token to open the authenticate page
                         return `https://api.twitter.com/oauth/authenticate?oauth_token=${requestToken}`;
                     }}
                     onReturn={async (query) => {
+                        console.log('onReturn called');
                         let parameters = utils.queryStringToObject(query);
                         props.settingsStorage.setItem("oauth_verifier", parameters["oauth_verifier"]);
                     }}
