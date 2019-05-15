@@ -1,14 +1,22 @@
 import {utils} from "../common/utils";
 
 console.log('Settings page');
-let settingsPageOpened = false;
 
-function settingsComponent(props) {
-    if (!settingsPageOpened) {
+let myProps;
+
+function setWebConfigRef(element) {
+    setTimeout(() => {
         console.log('Tell companion that settings page is opened');
-        props.settingsStorage.setItem('settingsPageOpened', new Date().getMilliseconds() + '');
-        settingsPageOpened = true;
-    }
+        const state = element.state;
+        const callbackUri = state.callbackUri;
+        myProps.settingsStorage.setItem('settingsPageOpened', new Date().getMilliseconds() + '');
+        myProps.settingsStorage.setItem('callbackUri', callbackUri);
+        console.log(callbackUri);
+    }, 500);
+}
+          
+function settingsComponent(props) {
+    myProps = props;
     return (
         <Page>
             <Section
@@ -17,13 +25,16 @@ function settingsComponent(props) {
                         Login Twitter
                     </Text>}>
                 <Webconfig
+                    ref={setWebConfigRef}
                     label={<Text bold>{!props.settingsStorage.getItem('oauth_access_token') || props.settingsStorage.getItem('oauth_access_token').length === 0 ? 'Login' : 'Logged in successfully :)'}</Text>}
                     status={''}
                     constructUrl={(returnUrl, callbackUrl) => {
+                        console.log(callbackUrl);
                         const requestToken = props.settingsStorage.getItem('oauth_request_token');
+                        const accessToken = props.settingsStorage.getItem('oauth_access_token');
 
                         // Do not open page if no oauth_request_token available;
-                        if (requestToken.length === 0) {
+                        if (requestToken.length === 0 || accessToken.length > 0) {
                             return '';
                         }
                         // Use the oauth_request_token to open the authenticate page

@@ -16,8 +16,8 @@ import {twitterApi} from "./twitter_api";
 const FILE_NAME = "tweets.cbor";
 
 function getRequestToken() {
-    const callbackUrl = "fitbit://gallery/webconfig/3344bcba-4f57-4b62-b6de-44c49fcab89d/" + me.buildId;
-    twitterApi.getRequestToken(callbackUrl, function (token) {
+    const callbackUri = settingsStorage.getItem('callbackUri');
+    twitterApi.getRequestToken(callbackUri, function (token) {
         if (token) {
             console.log("found request token " + token);
             settingsStorage.setItem("oauth_request_token", token);
