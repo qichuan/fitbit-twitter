@@ -4,7 +4,6 @@ import {twitterOAuth} from "./twitter_oauth";
 const requestTokenUrl = "https://api.twitter.com/oauth/request_token";
 const accessTokenUrl = "https://api.twitter.com/oauth/access_token";
 const homeTimelineUrl = "https://api.twitter.com/1.1/statuses/home_timeline.json";
-import { me } from "companion";
 
 function getRequestToken(newCallbackUrl, callback) {
     fetch(requestTokenUrl, {
@@ -12,7 +11,7 @@ function getRequestToken(newCallbackUrl, callback) {
         headers: {
             Authorization: twitterOAuth
                 .getAuthorizationForRequestToken('POST',
-                    requestTokenUrl, "fitbit://gallery/webconfig/3344bcba-4f57-4b62-b6de-44c49fcab89d/"+me.buildId)
+                    requestTokenUrl, newCallbackUrl)
         }
     }).then(res => res.text())
         .then(text => processRequestTokenResultQueryText(text, callback))

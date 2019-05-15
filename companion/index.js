@@ -5,7 +5,6 @@ import cbor from "cbor";
 import * as messaging from "messaging";
 import { Image } from "image";
 import { localStorage } from "local-storage";
-import { me } from "companion";
 
 // Import external 3rd party library
 import "fitbit-google-analytics/companion"
