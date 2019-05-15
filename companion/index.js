@@ -139,6 +139,7 @@ function loadTweets() {
  */
 function processHomeTimelineResult(jsonText) {
     const fullTweets = JSON.parse(jsonText);
+    const imageArray = [];
     if (fullTweets) {
         console.log(`${fullTweets.length} tweets received`);
         const simpleTweets = fullTweets.map((tweet, index) => {
@@ -164,10 +165,11 @@ function processHomeTimelineResult(jsonText) {
             const createdTime = new Date((tweet.created_at || "").replace(/-/g,"/")
                                 .replace(/[TZ]/g," ")).getTime();
 
-            // Load the avatar image
-            fetchAndTransferImageFile(
-                tweet.user.profile_image_url_https,
-                `avatar_${tweet.user.screen_name}.jpg`);
+            imageArray.push({
+                imageUrl: tweet.user.profile_image_url_https,
+                destFilename: `avatar_${tweet.user.screen_name}.jpg`
+            });
+            
             // Return only the necessary data to app
             return {
                 id: tweet.id,
@@ -180,6 +182,11 @@ function processHomeTimelineResult(jsonText) {
         });
         // Transfer the tweets to the app
         outbox.enqueue(FILE_NAME, cbor.encode(simpleTweets));
+
+        // Load the avatar images
+        for (var item of imageArray) {
+            fetchAndTransferImageFile(item.imageUrl,item.destFilename);
+        }
     }
 }
 
