@@ -1,4 +1,4 @@
-import {utils} from "../common/utils";
+import {utils} from "./utils";
 import {twitterOAuth} from "./twitter_oauth";
 
 const requestTokenUrl = "https://api.twitter.com/oauth/request_token";
@@ -6,7 +6,8 @@ const accessTokenUrl = "https://api.twitter.com/oauth/access_token";
 const homeTimelineUrl = "https://api.twitter.com/1.1/statuses/home_timeline.json";
 
 function getRequestToken(newCallbackUrl, callback) {
-    fetch(requestTokenUrl, {
+    // Use this proxy to bypass the cross-origin restriction in the settings page
+    fetch('https://cors-anywhere.herokuapp.com/'+requestTokenUrl, {
         method: "POST",
         headers: {
             Authorization: twitterOAuth
@@ -31,12 +32,13 @@ function getAccessToken(token, verifier, callback) {
         .catch(error => console.log('Error: ' + error.toLocaleString()));
 }
 
-function getHomeTimeline(callback) {
+function getHomeTimeline(accessToken, accessTokenSecret, callback) {
     fetch(homeTimelineUrl, {
         method: "GET",
         headers: {
             Authorization: twitterOAuth
-                .getAuthorizationForProtectedResource('GET', homeTimelineUrl)
+                .getAuthorizationForProtectedResource('GET', homeTimelineUrl, 
+                    accessToken, accessTokenSecret)
         }
     }).then(res => res.text())
         .then(text => callback(text))

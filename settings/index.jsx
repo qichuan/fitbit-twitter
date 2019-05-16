@@ -1,18 +1,29 @@
 import {utils} from "../common/utils";
-
+import {twitterApi} from "../common/twitter_api";
 console.log('Settings page');
 
 let myProps;
+let callbackUri = null;
 
 function setWebConfigRef(element) {
     setTimeout(() => {
-        console.log('Tell companion that settings page is opened');
         const state = element.state;
-        const callbackUri = state.callbackUri;
-        myProps.settingsStorage.setItem('settingsPageOpened', new Date().getMilliseconds() + '');
-        myProps.settingsStorage.setItem('callbackUri', callbackUri);
+
+        // The important thing here is to retrieve the callback Uri
+        callbackUri = state.callbackUri;
         console.log(callbackUri);
+        getRequestToken(callbackUri);
+
     }, 500);
+}
+
+function getRequestToken(callbackUri) {
+    twitterApi.getRequestToken(callbackUri, function (token) {
+        if (token) {
+            console.log("found request token " + token);
+            myProps.settingsStorage.setItem("oauth_request_token", token);
+        }
+    });
 }
           
 function settingsComponent(props) {
@@ -62,6 +73,7 @@ function settingsComponent(props) {
                     label="Logout"
                     onClick={() => {
                         props.settingsStorage.setItem("invokeLogout", new Date().getMilliseconds() + '');
+                        getRequestToken(callbackUri);
                     }}
                 />
             </Section>
