@@ -14,25 +14,39 @@ import {twitterApi} from "./twitter_api";
 
 const FILE_NAME = "tweets.cbor";
 
-// Reset oauth_request_token and callbackUrl
-settingsStorage.setItem('oauth_request_token', '');
-settingsStorage.setItem('callbackUrl', '');
+function getRequestToken() {
+    const callbackUri = settingsStorage.getItem('callbackUri');
+    twitterApi.getRequestToken(callbackUri, function (token) {
+        if (token) {
+            console.log("found request token " + token);
+            settingsStorage.setItem("oauth_request_token", token);
+        }
+    });
+}
 
 /////////////////////////////////////////////////
 // START OF EVENT TRIGGER CALLBACK IMPLEMENTATION
 /////////////////////////////////////////////////
 settingsStorage.onchange = function (evt) {
-    // Call the request token API when a new callbackUrl event arrives
-    if (evt.key === 'callbackUrl') {
-        const newCallbackUrl = evt.newValue;
-        if (newCallbackUrl.length === 0) {
-            return;
+    if (evt.key === 'settingsPageOpened') {
+        console.log('Setting page is opened');
+        // If the request token is not available, request one
+        if (!isUserLoggedIn()) {   
+            getRequestToken();
         }
-        twitterApi.getRequestToken(newCallbackUrl, function (token) {
-            if (token) {
-                console.log("found request token " + token);
-                settingsStorage.setItem("oauth_request_token", token);
-            }
+    }
+    // When logout button is clicked 
+    else if (evt.key === 'invokeLogout') {
+        console.log('Logout button is clicked');
+        settingsStorage.setItem("oauth_access_token", "");
+        settingsStorage.setItem("oauth_access_token_secret", "");
+        getRequestToken();
+
+        localStorage.clear();
+
+        send({
+            what: 'loginStatus',
+            data: false
         });
 
     // Call the access token API when a new oauth verifier event arrives
@@ -58,7 +72,7 @@ settingsStorage.onchange = function (evt) {
         // Reset the oauth_request_token;
         settingsStorage.setItem('oauth_request_token', '');
     } else if (evt.key === 'oauth_access_token') {
-        loadTweets();
+        // loadTweets();
     }
 };
 
@@ -69,6 +83,7 @@ messaging.peerSocket.onmessage = function (evt) {
 
     // The app is ready
     if (message.what === 'appReady') {
+        console.log('The device is ready');
         loadTweets();
     }
 };
@@ -76,6 +91,11 @@ messaging.peerSocket.onmessage = function (evt) {
 /////////////////////////////////////////////////
 // END OF EVENT TRIGGER CALLBACK IMPLEMENTATION
 /////////////////////////////////////////////////
+
+function isUserLoggedIn() {
+    return settingsStorage.getItem('oauth_access_token') != null
+                                && settingsStorage.getItem('oauth_access_token').length > 0
+}
 
 /**
  * Load the Tweets from server
@@ -85,27 +105,21 @@ function loadTweets() {
     send({
         what: 'spinner',
         data: true
-    })
+    });
 
     // Get user login status
-    let isUserLoggedIn = false;
-    if (settingsStorage.getItem('oauth_access_token')) {
-        isUserLoggedIn = true;
-    }  else {
-        // clear local storage
-        localStorage.clear();
-    }
+    const loggedIn = isUserLoggedIn();
 
-    console.log('Login status ' + isUserLoggedIn);
+    console.log('Login status ' + loggedIn);
 
     // Tell app the login status
     send({
         what: 'loginStatus',
-        data: isUserLoggedIn
+        data: loggedIn
     });
 
     // If user has already logged in, retrieve the current home timeline
-    if (isUserLoggedIn) {
+    if (loggedIn) {
         twitterApi.getHomeTimeline(processHomeTimelineResult);
     } else {
         // Tell app to hide the spinner
@@ -125,6 +139,7 @@ function loadTweets() {
  */
 function processHomeTimelineResult(jsonText) {
     const fullTweets = JSON.parse(jsonText);
+    const imageArray = [];
     if (fullTweets) {
         console.log(`${fullTweets.length} tweets received`);
         const simpleTweets = fullTweets.map((tweet, index) => {
@@ -150,10 +165,11 @@ function processHomeTimelineResult(jsonText) {
             const createdTime = new Date((tweet.created_at || "").replace(/-/g,"/")
                                 .replace(/[TZ]/g," ")).getTime();
 
-            // Load the avatar image
-            fetchAndTransferImageFile(
-                tweet.user.profile_image_url_https,
-                `avatar_${tweet.user.screen_name}.jpg`);
+            imageArray.push({
+                imageUrl: tweet.user.profile_image_url_https,
+                destFilename: `avatar_${tweet.user.screen_name}.jpg`
+            });
+            
             // Return only the necessary data to app
             return {
                 id: tweet.id,
@@ -166,6 +182,11 @@ function processHomeTimelineResult(jsonText) {
         });
         // Transfer the tweets to the app
         outbox.enqueue(FILE_NAME, cbor.encode(simpleTweets));
+
+        // Load the avatar images
+        for (var item of imageArray) {
+            fetchAndTransferImageFile(item.imageUrl,item.destFilename);
+        }
     }
 }
 
