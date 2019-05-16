@@ -10,38 +10,19 @@ import { localStorage } from "local-storage";
 import "fitbit-google-analytics/companion"
 
 // Import internal librrary
-import {twitterApi} from "./twitter_api";
+import {twitterApi} from "../common/twitter_api";
 
 const FILE_NAME = "tweets.cbor";
-
-function getRequestToken() {
-    const callbackUri = settingsStorage.getItem('callbackUri');
-    twitterApi.getRequestToken(callbackUri, function (token) {
-        if (token) {
-            console.log("found request token " + token);
-            settingsStorage.setItem("oauth_request_token", token);
-        }
-    });
-}
 
 /////////////////////////////////////////////////
 // START OF EVENT TRIGGER CALLBACK IMPLEMENTATION
 /////////////////////////////////////////////////
 settingsStorage.onchange = function (evt) {
-    if (evt.key === 'settingsPageOpened') {
-        console.log('Setting page is opened');
-        // If the request token is not available, request one
-        if (!isUserLoggedIn()) {   
-            getRequestToken();
-        }
-    }
     // When logout button is clicked 
-    else if (evt.key === 'invokeLogout') {
+    if (evt.key === 'invokeLogout') {
         console.log('Logout button is clicked');
         settingsStorage.setItem("oauth_access_token", "");
         settingsStorage.setItem("oauth_access_token_secret", "");
-        getRequestToken();
-
         localStorage.clear();
 
         send({
@@ -120,8 +101,10 @@ function loadTweets() {
 
     // If user has already logged in, retrieve the current home timeline
     if (loggedIn) {
-        twitterApi.getHomeTimeline(processHomeTimelineResult);
-    } else {
+        let accessToken = settingsStorage.getItem('oauth_access_token');
+        let accessTokenSecret = settingsStorage.getItem('oauth_access_token_secret');
+        twitterApi.getHomeTimeline(accessToken, accessTokenSecret, processHomeTimelineResult);
+    } else {3
         // Tell app to hide the spinner
         send({
             what: 'spinner',

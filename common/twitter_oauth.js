@@ -1,8 +1,8 @@
 
-import {settingsStorage} from "settings";
-import {jsSHA} from "./sha1";
-import {consumerKey, consumerSecret} from "./common";
-import {Base64} from "./base64";
+//import {settingsStorage} from "settings";
+import {jsSHA} from "../companion/sha1";
+import {consumerKey, consumerSecret} from "../companion/common";
+import {Base64} from "../companion/base64";
 
 /**
  * For Request Token
@@ -102,13 +102,11 @@ function genSortedParamStrForAccessToken(key, timestamp, nonce, token, verifier)
  * For Home Timeline
  */
 
-function getAuthorizationForProtectedResource(httpMethod, baseUrl) {
+function getAuthorizationForProtectedResource(httpMethod, baseUrl, accessToken, accessTokenSecret) {
     // timestamp as unix epoch
     let timestamp = Math.round(Date.now() / 1000);
     // nonce as base64 encoded unique random string
     let nonce = Base64.btoa(consumerKey + ':' + timestamp);
-    let accessToken = settingsStorage.getItem('oauth_access_token');
-    let accessTokenSecret = settingsStorage.getItem('oauth_access_token_secret');
 
     // generate signature from base string & signing key
     let baseString = oAuthBaseStringForProtectedResource(httpMethod, baseUrl, consumerKey, timestamp, nonce, accessToken);
