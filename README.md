@@ -16,7 +16,7 @@ Downloadable from Fitbit App Gallary at [https://gam.fitbit.com/gallery/app/3344
 First download and install the npm dependencies
 
 ```
-$ npm install
+$ yarn install
 ```
 
 Then login to your Fitbit development account
