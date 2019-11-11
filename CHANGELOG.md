@@ -1,3 +1,6 @@
+## [1.1.3] 11 Nov 2019
+- Support Versa 2
+
 ## [1.1.1.1] 15 May 2019
 - Simplify the Twitter Login process
 
