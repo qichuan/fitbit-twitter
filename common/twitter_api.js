@@ -4,6 +4,7 @@ import {twitterOAuth} from "./twitter_oauth";
 const requestTokenUrl = "https://api.twitter.com/oauth/request_token";
 const accessTokenUrl = "https://api.twitter.com/oauth/access_token";
 const homeTimelineUrl = "https://api.twitter.com/1.1/statuses/home_timeline.json";
+const likeTweetUrl = "https://api.twitter.com/1.1/favorites/create.json";
 
 function getRequestToken(newCallbackUrl, callback) {
     // Use this proxy to bypass the cross-origin restriction in the settings page
@@ -45,6 +46,20 @@ function getHomeTimeline(accessToken, accessTokenSecret, callback) {
         .catch(error => console.log('Error: ' + error.toLocaleString()));
 }
 
+function likeTweet(tweetIdToLike, accessToken, accessTokenSecret, callback) {
+    const url = likeTweetUrl+"?id="+tweetIdToLike;
+    fetch(url, {
+        method: "POST",
+        headers: {
+            Authorization: twitterOAuth
+                .getAuthorizationForProtectedResource('POST', url, 
+                    accessToken, accessTokenSecret)
+        }
+    }).then(res => res.text())
+        .then(text => callback(text))
+        .catch(error => console.log('Error: ' + error.toLocaleString()));
+}
+
 
 function processRequestTokenResultQueryText(queryText, callback) {
     if (queryText) {
@@ -68,7 +83,7 @@ function processAccessTokenResultQueryText(queryText, callback) {
 }
 
 const twitterApi = {
-    getRequestToken, getAccessToken, getHomeTimeline
+    getRequestToken, getAccessToken, getHomeTimeline, likeTweet
 };
 
 export {twitterApi}

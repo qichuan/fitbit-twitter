@@ -66,6 +66,8 @@ messaging.peerSocket.onmessage = function (evt) {
     if (message.what === 'appReady') {
         console.log('The device is ready');
         loadTweets();
+    } else if (message.what === 'like') {
+        likeTweet(message.data);
     }
 };
 
@@ -104,7 +106,7 @@ function loadTweets() {
         let accessToken = settingsStorage.getItem('oauth_access_token');
         let accessTokenSecret = settingsStorage.getItem('oauth_access_token_secret');
         twitterApi.getHomeTimeline(accessToken, accessTokenSecret, processHomeTimelineResult);
-    } else {3
+    } else {
         // Tell app to hide the spinner
         send({
             what: 'spinner',
@@ -201,11 +203,25 @@ function fetchAndTransferImageFile(imageUrl, destFilename) {
         console.log("Failure: " + error);
     });
 }
+/**
+ * Favorites (likes) the Tweet specified in the tweetId parameter 
+ * 
+ * @param {number} tweetId 
+ */
+function likeTweet(tweetId) {
+    let accessToken = settingsStorage.getItem('oauth_access_token');
+    let accessTokenSecret = settingsStorage.getItem('oauth_access_token_secret');
+    twitterApi.likeTweet(tweetId, accessToken, accessTokenSecret, processLikeTweet);
+}
+
+function processLikeTweet(result) {
+    console.log(result);
+}
 
 /**
  * A convenient method to send data to app if the peer socket is opened
  * 
- * @param {*} data the data to be sent to app
+ * @param {object} data the data to be sent to app
  */
 function send(data) {
     if (messaging.peerSocket.readyState === messaging.peerSocket.OPEN) {

@@ -150,12 +150,19 @@ const listDelegate = {
                 tile.getElementById("author").text = `@${info.value.author}`;
                 tile.getElementById("footer").text = `❤️ ${info.value.likes} · ${utils.prettyDate(info.value.createdTime)}`;
                 tile.getElementById("text").text = info.value.text;
+                tile.getElementById("footer").onclick = evt => {
+                    console.log('like ' + info.value.id);
+                    send({
+                        what: 'like',
+                        data: info.value.id
+                    });
+                }
             }
             // Reserve for future use
-            let touch = tile.getElementById("touch-me");
-            touch.onclick = evt => {
-                console.log(`touched: ${info.index}`);
-            };
+            // let touch = tile.getElementById("touch-me");
+            // touch.onclick = evt => {
+            //     console.log(`touched: ${info.index}`);
+            // };
         }
     },
 };

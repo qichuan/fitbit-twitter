@@ -14,13 +14,13 @@
       <textarea id="text" />
 
       <!-- The footer text -->
-      <text id="footer" class="footer" />
+      <text id="footer" class="footer" pointer-events="all"/>
 
       <!-- The divider -->
       <rect id="tile-divider-bottom" class="tile-divider-bottom" />
       <!-- Reserve the touch event for future use -->
-      <rect id="touch-me" pointer-events="all" x="0" y="0" width="100%"
-            height="100%-2" opacity="0" />
+      <!-- <rect id="touch-me" pointer-events="all" x="0" y="0" width="100%"
+            height="100%-2" opacity="0" /> -->
     </symbol>
   </defs>
 
