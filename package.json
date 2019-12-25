@@ -2,10 +2,10 @@
   "name": "fitbit-twitter",
   "version": "1.1.3",
   "private": true,
-  "license": "UNLICENSED",
+  "license": "MIT",
   "devDependencies": {
-    "@fitbit/sdk": "~4.0.0",
-    "@fitbit/sdk-cli": "^1.7.0"
+    "@fitbit/sdk": "~4.1.0",
+    "@fitbit/sdk-cli": "^1.7.1"
   },
   "fitbit": {
     "appUUID": "3344bcba-4f57-4b62-b6de-44c49fcab89d",
