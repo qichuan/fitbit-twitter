@@ -29,6 +29,13 @@ let list = document.getElementById("my-list");
 let welcomeLine1 = document.getElementById("welcome_line1");
 let welcomeLine2 = document.getElementById("welcome_line2");
 
+// The combo butons
+let retweetButton = document.getElementById("btn-retweet");
+let likeButton = document.getElementById("btn-like");
+
+likeButton.state = "disabled";
+retweetButton.state = "disabled";
+
 // The spinner
 let spinner = document.getElementById("spinner");
 
@@ -37,6 +44,9 @@ spinner.state = "enabled";
 
 // The array to store the tweets
 let tweets = [];
+
+// The current tweetId;
+let currentTweetId = null;
 
 // Read the tweets from file if any
 setTimeout(function(){ 
@@ -78,10 +88,14 @@ messaging.peerSocket.onmessage = function (evt) {
             welcomeLine1.style.visibility = "hidden";
             welcomeLine2.style.visibility = "hidden";
             list.style.visibility = "visible";
+            likeButton.state = "enabled";
+            retweetButton.state = "enabled";
         } else {
             welcomeLine1.style.visibility = "visible";
             welcomeLine2.style.visibility = "visible";
             list.style.visibility = "hidden";
+            likeButton.state = "disabled";
+            retweetButton.state = "disabled";
 
             // Delete tweets file and all avatar files
             const listDir = fs.listDirSync("/private/data");
@@ -157,6 +171,7 @@ const listDelegate = {
                         data: info.value.id
                     });
                 }
+                currentTweetId = info.value.id;
             }
             // Reserve for future use
             // let touch = tile.getElementById("touch-me");
@@ -193,6 +208,8 @@ function setTweetListToTileList(tweetList) {
     list.delegate = listDelegate;
     list.length = tweetList.length;
     spinner.state = "disabled";
+    likeButton.state = "enabled";
+    retweetButton.state = "enabled";
 }
 
 /**
