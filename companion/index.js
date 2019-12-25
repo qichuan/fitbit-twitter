@@ -157,7 +157,7 @@ function processHomeTimelineResult(jsonText) {
             
             // Return only the necessary data to app
             return {
-                id: tweet.id,
+                id: tweet.id_str,
                 text: sanitizedText,
                 createdTime: createdTime,
                 author: tweet.user.screen_name,
@@ -206,7 +206,7 @@ function fetchAndTransferImageFile(imageUrl, destFilename) {
 /**
  * Favorites (likes) the Tweet specified in the tweetId parameter 
  * 
- * @param {number} tweetId 
+ * @param {string} tweetId 
  */
 function likeTweet(tweetId) {
     let accessToken = settingsStorage.getItem('oauth_access_token');
