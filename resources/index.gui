@@ -14,7 +14,7 @@
       <textarea id="text" />
 
       <!-- The footer text -->
-      <text id="footer" class="footer" pointer-events="all"/>
+      <text id="footer" class="footer"/>
 
       <!-- The divider -->
       <rect id="tile-divider-bottom" class="tile-divider-bottom" />
@@ -46,4 +46,18 @@
 
   <!-- The spinner -->
   <use id="spinner" href="#spinner" />
+
+   <!-- TOP RIGHT -->
+  <use id="btn-retweet" href="#combo-button-upper-right" fill="fb-green" class="combo-button">
+    <set href="combo-button-icon" attributeName="href" to="icons/retweet.png"/>
+    <set href="combo-button-icon-press" attributeName="href" to="icons/retweet.png"/>
+    <set href="combo-button-stroke" attributeName="display" to="inline"/>
+  </use>
+
+     <!-- BOTTOM RIGHT -->
+  <use id="btn-like" href="#combo-button-lower-right" fill="fb-red" class="combo-button">
+    <set href="combo-button-icon" attributeName="href" to="icons/heart.png"/>
+    <set href="combo-button-icon-press" attributeName="href" to="icons/heart_press.png"/>
+    <set href="combo-button-stroke" attributeName="display" to="inline"/>
+  </use>
 </svg>
