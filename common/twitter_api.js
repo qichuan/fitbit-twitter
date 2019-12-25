@@ -40,7 +40,7 @@ function getHomeTimeline(accessToken, accessTokenSecret, callback) {
         headers: {
             Authorization: twitterOAuth
                 .getAuthorizationForProtectedResource('GET', homeTimelineUrl, 
-                    accessToken, accessTokenSecret)
+                    accessToken, accessTokenSecret, {})
         }
     }).then(res => res.text())
         .then(text => callback(text))
