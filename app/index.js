@@ -24,8 +24,7 @@ const TWEETS_FILE_NAME = "tweets.cbor";
 
 // The tile list
 let list = document.getElementById("my-list");
-
-
+list.overflow = "visible";
 
 list.onlistforward = evt => {
     currentIndex = evt.middle;
@@ -47,12 +46,16 @@ likeButton.state = "disabled";
 retweetButton.state = "disabled";
 
 likeButton.onactivate = evt => {
-    console.log('Index ' + currentIndex);
-    console.log('like ' + tweets[currentIndex].id);
-
+    // Update model
     tweets[currentIndex].likes = tweets[currentIndex].likes + 1;
-    list.redraw();
 
+    // Update view
+    document.getElementsByClassName("footer").forEach(element => {
+        if (element.tweetId === tweets[currentIndex].id) {
+            updateFooter(element, tweets[currentIndex]);
+        }
+    });
+    // 
     // send({
     //     what: 'like',
     //     data: info.value.id
@@ -170,6 +173,16 @@ inbox.onnewfile = () => {
 // END OF EVENT TRIGGER CALLBACK IMPLEMENTATION
 /////////////////////////////////////////////////
 
+/**
+ * Update the footer text element with the tweet object
+ * @param element the footer text element
+ * @param tweet the data object
+ */
+function updateFooter(element, tweet) {
+    element.tweetId = tweet.id;
+    element.text = `❤️ ${tweet.likes} · ${utils.prettyDate(tweet.createdTime)}`;
+}
+
 // List delegate to bind the view models to the tile list
 const listDelegate = {
     getTileInfo: function (index) {
@@ -185,17 +198,14 @@ const listDelegate = {
                 tile.getElementById("avatar").image = `/private/data/avatar_${info.value.author}.jpg`;
                 tile.getElementById("fullname").text = info.value.fullName;
                 tile.getElementById("author").text = `@${info.value.author}`;
-                tile.getElementById("footer").text = `❤️ ${info.value.likes} · ${utils.prettyDate(info.value.createdTime)}`;
                 tile.getElementById("text").text = info.value.text;
+                updateFooter(tile.getElementById("footer"), info.value);
             }
             // Reserve for future use
             // let touch = tile.getElementById("touch-me");
             // touch.onclick = evt => {
             //     console.log(`touched: ${info.index}`);
             // };
-            if (info.index === 0) {
-                tile.align({alignment: 'top', animate: true, redraw: true });
-            }
         }
     },
 };
