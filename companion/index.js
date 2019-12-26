@@ -68,6 +68,8 @@ messaging.peerSocket.onmessage = function (evt) {
         loadTweets();
     } else if (message.what === 'like') {
         likeTweet(message.data);
+    } else if (message.what === 'retweet') {
+        retweet(message.data);
     }
 };
 
@@ -217,6 +219,20 @@ function likeTweet(tweetId) {
 }
 
 function processLikeTweet(result) {
+    // console.log(result);
+    // Do nothing here
+}
+/**
+ * Retweet the Tweet specified in the tweetId parameter 
+ * @param {string} tweetId 
+ */
+function retweet(tweetId) {
+    let accessToken = settingsStorage.getItem('oauth_access_token');
+    let accessTokenSecret = settingsStorage.getItem('oauth_access_token_secret');
+    twitterApi.retweet(tweetId, accessToken, accessTokenSecret, processRetweet);
+}
+
+function processRetweet(result) {
     // console.log(result);
     // Do nothing here
 }

@@ -73,6 +73,20 @@ likeButton.onactivate = evt => {
     });
 }
 
+retweetButton.onactivate = evt => {
+    // Update model
+    tweets[currentIndex].retweeted = true;
+
+    // Update view
+    updateComboButtonStatus();
+
+    // Send like request to tweeter server
+    send({
+        what: 'retweet',
+        data: tweets[currentIndex].id
+    });
+}
+
 // The spinner
 let spinner = document.getElementById("spinner");
 
