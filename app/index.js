@@ -25,6 +25,16 @@ const TWEETS_FILE_NAME = "tweets.cbor";
 // The tile list
 let list = document.getElementById("my-list");
 
+
+
+list.onlistforward = evt => {
+    currentIndex = evt.middle;
+}
+
+list.onlistbackward = evt => {
+    currentIndex = evt.middle;
+}
+
 // The welcome texts
 let welcomeLine1 = document.getElementById("welcome_line1");
 let welcomeLine2 = document.getElementById("welcome_line2");
@@ -36,6 +46,19 @@ let likeButton = document.getElementById("btn-like");
 likeButton.state = "disabled";
 retweetButton.state = "disabled";
 
+likeButton.onactivate = evt => {
+    console.log('Index ' + currentIndex);
+    console.log('like ' + tweets[currentIndex].id);
+
+    tweets[currentIndex].likes = tweets[currentIndex].likes + 1;
+    list.redraw();
+
+    // send({
+    //     what: 'like',
+    //     data: info.value.id
+    // });
+}
+
 // The spinner
 let spinner = document.getElementById("spinner");
 
@@ -45,8 +68,8 @@ spinner.state = "enabled";
 // The array to store the tweets
 let tweets = [];
 
-// The current tweetId;
-let currentTweetId = null;
+// The current index;
+let currentIndex = 0
 
 // Read the tweets from file if any
 setTimeout(function(){ 
@@ -164,20 +187,15 @@ const listDelegate = {
                 tile.getElementById("author").text = `@${info.value.author}`;
                 tile.getElementById("footer").text = `❤️ ${info.value.likes} · ${utils.prettyDate(info.value.createdTime)}`;
                 tile.getElementById("text").text = info.value.text;
-                tile.getElementById("footer").onclick = evt => {
-                    console.log('like ' + info.value.id);
-                    send({
-                        what: 'like',
-                        data: info.value.id
-                    });
-                }
-                currentTweetId = info.value.id;
             }
             // Reserve for future use
             // let touch = tile.getElementById("touch-me");
             // touch.onclick = evt => {
             //     console.log(`touched: ${info.index}`);
             // };
+            if (info.index === 0) {
+                tile.align({alignment: 'top', animate: true, redraw: true });
+            }
         }
     },
 };
