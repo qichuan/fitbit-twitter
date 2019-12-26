@@ -28,10 +28,18 @@ list.overflow = "visible";
 
 list.onlistforward = evt => {
     currentIndex = evt.middle;
+    updateComboButtonStatus();
 }
 
 list.onlistbackward = evt => {
     currentIndex = evt.middle;
+    updateComboButtonStatus();
+}
+
+function updateComboButtonStatus() {
+    const tweet = tweets[currentIndex];
+    likeButton.state = tweet.favorited ? "disabled" : "enabled";
+    retweetButton.state = tweet.retweeted ? "disabled" : "enabled";
 }
 
 // The welcome texts
@@ -48,6 +56,7 @@ retweetButton.state = "disabled";
 likeButton.onactivate = evt => {
     // Update model
     tweets[currentIndex].likes = tweets[currentIndex].likes + 1;
+    tweets[currentIndex].favorited = true;
 
     // Update view
     document.getElementsByClassName("footer").forEach(element => {
@@ -55,11 +64,13 @@ likeButton.onactivate = evt => {
             updateFooter(element, tweets[currentIndex]);
         }
     });
-    // 
-    // send({
-    //     what: 'like',
-    //     data: info.value.id
-    // });
+    updateComboButtonStatus();
+
+    // Send like request to tweeter server
+    send({
+        what: 'like',
+        data: tweets[currentIndex].id
+    });
 }
 
 // The spinner

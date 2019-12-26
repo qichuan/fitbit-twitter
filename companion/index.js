@@ -163,6 +163,8 @@ function processHomeTimelineResult(jsonText) {
                 author: tweet.user.screen_name,
                 fullName: tweet.user.name,
                 likes: tweet.favorite_count,
+                favorited: tweet.favorited,
+                retweeted: tweet.retweeted
             }
         });
         // Transfer the tweets to the app
@@ -215,7 +217,8 @@ function likeTweet(tweetId) {
 }
 
 function processLikeTweet(result) {
-    console.log(result);
+    // console.log(result);
+    // Do nothing here
 }
 
 /**
