@@ -71,6 +71,14 @@ likeButton.onactivate = evt => {
         what: 'like',
         data: tweets[currentIndex].id
     });
+
+    // Send analytics data
+    analytics.send({
+        hit_type: "event",
+        event_category: "Display",
+        event_action: "Tap",
+        event_label: "Like"
+    });
 }
 
 retweetButton.onactivate = evt => {
@@ -84,6 +92,14 @@ retweetButton.onactivate = evt => {
     send({
         what: 'retweet',
         data: tweets[currentIndex].id
+    });
+
+     // Send analytics data
+     analytics.send({
+        hit_type: "event",
+        event_category: "Display",
+        event_action: "Tap",
+        event_label: "Retweet"
     });
 }
 
@@ -136,12 +152,22 @@ messaging.peerSocket.onmessage = function (evt) {
     if (message.what === 'loginStatus') {
         // Hide the welcome text if user has already logged in
         if (message.data) {
+            // Send analytics data
+            analytics.send({
+                hit_type: "screenview",
+                screen_name: "Main View"
+            });
+
             welcomeLine1.style.visibility = "hidden";
             welcomeLine2.style.visibility = "hidden";
             list.style.visibility = "visible";
-            likeButton.state = "enabled";
-            retweetButton.state = "enabled";
         } else {
+            // Send analytics data
+            analytics.send({
+                hit_type: "screenview",
+                screen_name: "Welcome View"
+            });
+
             welcomeLine1.style.visibility = "visible";
             welcomeLine2.style.visibility = "visible";
             list.style.visibility = "hidden";
