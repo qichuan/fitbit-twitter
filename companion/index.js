@@ -14,6 +14,17 @@ import {twitterApi} from "../common/twitter_api";
 
 const FILE_NAME = "tweets.cbor";
 
+function clearAll() {
+    settingsStorage.setItem("oauth_access_token", "");
+    settingsStorage.setItem("oauth_access_token_secret", "");
+    localStorage.clear();
+
+    send({
+        what: 'loginStatus',
+        data: false
+    });
+}
+
 /////////////////////////////////////////////////
 // START OF EVENT TRIGGER CALLBACK IMPLEMENTATION
 /////////////////////////////////////////////////
@@ -21,14 +32,7 @@ settingsStorage.onchange = function (evt) {
     // When logout button is clicked 
     if (evt.key === 'invokeLogout') {
         console.log('Logout button is clicked');
-        settingsStorage.setItem("oauth_access_token", "");
-        settingsStorage.setItem("oauth_access_token_secret", "");
-        localStorage.clear();
-
-        send({
-            what: 'loginStatus',
-            data: false
-        });
+        clearAll();
 
     // Call the access token API when a new oauth verifier event arrives
     } else if (evt.key === 'oauth_verifier') {
@@ -66,6 +70,10 @@ messaging.peerSocket.onmessage = function (evt) {
     if (message.what === 'appReady') {
         console.log('The device is ready');
         loadTweets();
+    } else if (message.what === 'like') {
+        likeTweet(message.data);
+    } else if (message.what === 'retweet') {
+        retweet(message.data);
     }
 };
 
@@ -104,7 +112,7 @@ function loadTweets() {
         let accessToken = settingsStorage.getItem('oauth_access_token');
         let accessTokenSecret = settingsStorage.getItem('oauth_access_token_secret');
         twitterApi.getHomeTimeline(accessToken, accessTokenSecret, processHomeTimelineResult);
-    } else {3
+    } else {
         // Tell app to hide the spinner
         send({
             what: 'spinner',
@@ -124,6 +132,11 @@ function processHomeTimelineResult(jsonText) {
     const fullTweets = JSON.parse(jsonText);
     const imageArray = [];
     if (fullTweets) {
+        // If error encountered
+        if (fullTweets.errors) {
+            clearAll();
+            return;
+        }
         console.log(`${fullTweets.length} tweets received`);
         const simpleTweets = fullTweets.map((tweet, index) => {
             // Some unicode characters are not displayable in Fitbit devices, so we need to santize the text here
@@ -155,12 +168,14 @@ function processHomeTimelineResult(jsonText) {
             
             // Return only the necessary data to app
             return {
-                id: tweet.id,
+                id: tweet.id_str,
                 text: sanitizedText,
                 createdTime: createdTime,
                 author: tweet.user.screen_name,
                 fullName: tweet.user.name,
                 likes: tweet.favorite_count,
+                favorited: tweet.favorited,
+                retweeted: tweet.retweeted
             }
         });
         // Transfer the tweets to the app
@@ -201,11 +216,40 @@ function fetchAndTransferImageFile(imageUrl, destFilename) {
         console.log("Failure: " + error);
     });
 }
+/**
+ * Favorites (likes) the Tweet specified in the tweetId parameter 
+ * 
+ * @param {string} tweetId 
+ */
+function likeTweet(tweetId) {
+    let accessToken = settingsStorage.getItem('oauth_access_token');
+    let accessTokenSecret = settingsStorage.getItem('oauth_access_token_secret');
+    twitterApi.likeTweet(tweetId, accessToken, accessTokenSecret, processLikeTweet);
+}
+
+function processLikeTweet(result) {
+    // console.log(result);
+    // Do nothing here
+}
+/**
+ * Retweet the Tweet specified in the tweetId parameter 
+ * @param {string} tweetId 
+ */
+function retweet(tweetId) {
+    let accessToken = settingsStorage.getItem('oauth_access_token');
+    let accessTokenSecret = settingsStorage.getItem('oauth_access_token_secret');
+    twitterApi.retweet(tweetId, accessToken, accessTokenSecret, processRetweet);
+}
+
+function processRetweet(result) {
+    // console.log(result);
+    // Do nothing here
+}
 
 /**
  * A convenient method to send data to app if the peer socket is opened
  * 
- * @param {*} data the data to be sent to app
+ * @param {object} data the data to be sent to app
  */
 function send(data) {
     if (messaging.peerSocket.readyState === messaging.peerSocket.OPEN) {

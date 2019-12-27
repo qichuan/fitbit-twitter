@@ -24,10 +24,92 @@ const TWEETS_FILE_NAME = "tweets.cbor";
 
 // The tile list
 let list = document.getElementById("my-list");
+list.overflow = "visible";
+
+list.onlistforward = evt => {
+    currentIndex = evt.middle;
+    updateComboButtonStatus();
+}
+
+list.onlistbackward = evt => {
+    currentIndex = evt.middle;
+    updateComboButtonStatus();
+}
 
 // The welcome texts
 let welcomeLine1 = document.getElementById("welcome_line1");
 let welcomeLine2 = document.getElementById("welcome_line2");
+
+// The combo buttons
+let retweetButton = document.getElementById("btn-retweet");
+let likeButton = document.getElementById("btn-like");
+
+// The combo button initial status is disabled
+likeButton.state = "disabled";
+retweetButton.state = "disabled";
+
+let comboEnabled = false;
+
+function updateComboButtonStatus() {
+    const tweet = tweets[currentIndex];
+    if (comboEnabled) {
+        likeButton.state = tweet.favorited && comboEnabled ? "disabled" : "enabled";
+        retweetButton.state = tweet.retweeted && comboEnabled ? "disabled" : "enabled";
+    } else {
+        likeButton.state = "disabled";
+        retweetButton.state = "disabled";
+    }
+}
+
+likeButton.onactivate = evt => {
+    // Update model
+    tweets[currentIndex].likes = tweets[currentIndex].likes + 1;
+    tweets[currentIndex].favorited = true;
+
+    // Update view
+    document.getElementsByClassName("footer").forEach(element => {
+        if (element.tweetId === tweets[currentIndex].id) {
+            updateFooter(element, tweets[currentIndex]);
+        }
+    });
+    updateComboButtonStatus();
+
+    // Send like request to tweeter server
+    send({
+        what: 'like',
+        data: tweets[currentIndex].id
+    });
+
+    // Send analytics data
+    analytics.send({
+        hit_type: "event",
+        event_category: "Display",
+        event_action: "Tap",
+        event_label: "Like"
+    });
+}
+
+retweetButton.onactivate = evt => {
+    // Update model
+    tweets[currentIndex].retweeted = true;
+
+    // Update view
+    updateComboButtonStatus();
+
+    // Send like request to tweeter server
+    send({
+        what: 'retweet',
+        data: tweets[currentIndex].id
+    });
+
+     // Send analytics data
+     analytics.send({
+        hit_type: "event",
+        event_category: "Display",
+        event_action: "Tap",
+        event_label: "Retweet"
+    });
+}
 
 // The spinner
 let spinner = document.getElementById("spinner");
@@ -37,6 +119,9 @@ spinner.state = "enabled";
 
 // The array to store the tweets
 let tweets = [];
+
+// The current index;
+let currentIndex = 0
 
 // Read the tweets from file if any
 setTimeout(function(){ 
@@ -75,10 +160,22 @@ messaging.peerSocket.onmessage = function (evt) {
     if (message.what === 'loginStatus') {
         // Hide the welcome text if user has already logged in
         if (message.data) {
+            // Send analytics data
+            analytics.send({
+                hit_type: "screenview",
+                screen_name: "Main View"
+            });
+
             welcomeLine1.style.visibility = "hidden";
             welcomeLine2.style.visibility = "hidden";
             list.style.visibility = "visible";
         } else {
+            // Send analytics data
+            analytics.send({
+                hit_type: "screenview",
+                screen_name: "Welcome View"
+            });
+
             welcomeLine1.style.visibility = "visible";
             welcomeLine2.style.visibility = "visible";
             list.style.visibility = "hidden";
@@ -123,6 +220,11 @@ inbox.onnewfile = () => {
                 const data = readTweetsFromFile(fileName);
                 if (data) {
                     setTweetListToTileList(data);
+                    // Enable the combo buttons only if the tweets are retrieved from remote server
+                    // Which means the Internet connectivity is most likely available for the app to 
+                    // send like and retweet requests
+                    comboEnabled = true;
+                    updateComboButtonStatus();
                 }
             }
         }
@@ -132,6 +234,16 @@ inbox.onnewfile = () => {
 /////////////////////////////////////////////////
 // END OF EVENT TRIGGER CALLBACK IMPLEMENTATION
 /////////////////////////////////////////////////
+
+/**
+ * Update the footer text element with the tweet object
+ * @param element the footer text element
+ * @param tweet the data object
+ */
+function updateFooter(element, tweet) {
+    element.tweetId = tweet.id;
+    element.text = `❤️ ${tweet.likes} · ${utils.prettyDate(tweet.createdTime)}`;
+}
 
 // List delegate to bind the view models to the tile list
 const listDelegate = {
@@ -148,14 +260,14 @@ const listDelegate = {
                 tile.getElementById("avatar").image = `/private/data/avatar_${info.value.author}.jpg`;
                 tile.getElementById("fullname").text = info.value.fullName;
                 tile.getElementById("author").text = `@${info.value.author}`;
-                tile.getElementById("footer").text = `❤️ ${info.value.likes} · ${utils.prettyDate(info.value.createdTime)}`;
                 tile.getElementById("text").text = info.value.text;
+                updateFooter(tile.getElementById("footer"), info.value);
             }
             // Reserve for future use
-            let touch = tile.getElementById("touch-me");
-            touch.onclick = evt => {
-                console.log(`touched: ${info.index}`);
-            };
+            // let touch = tile.getElementById("touch-me");
+            // touch.onclick = evt => {
+            //     console.log(`touched: ${info.index}`);
+            // };
         }
     },
 };

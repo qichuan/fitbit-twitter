@@ -102,14 +102,14 @@ function genSortedParamStrForAccessToken(key, timestamp, nonce, token, verifier)
  * For Home Timeline
  */
 
-function getAuthorizationForProtectedResource(httpMethod, baseUrl, accessToken, accessTokenSecret) {
+function getAuthorizationForProtectedResource(httpMethod, baseUrl, accessToken, accessTokenSecret, additionalParams) {
     // timestamp as unix epoch
     let timestamp = Math.round(Date.now() / 1000);
     // nonce as base64 encoded unique random string
     let nonce = Base64.btoa(consumerKey + ':' + timestamp);
 
     // generate signature from base string & signing key
-    let baseString = oAuthBaseStringForProtectedResource(httpMethod, baseUrl, consumerKey, timestamp, nonce, accessToken);
+    let baseString = oAuthBaseStringForProtectedResource(httpMethod, baseUrl, consumerKey, timestamp, nonce, accessToken, additionalParams);
     let signingKey = oAuthSigningKeyWithAccessTokenScrect(consumerSecret, accessTokenSecret);
     let signature = oAuthSignature(baseString, signingKey);
 
@@ -124,13 +124,13 @@ function getAuthorizationForProtectedResource(httpMethod, baseUrl, accessToken, 
         'oauth_version="1.0"';
 }
 
-function oAuthBaseStringForProtectedResource(method, url, key, timestamp, nonce, accessToken) {
+function oAuthBaseStringForProtectedResource(method, url, key, timestamp, nonce, accessToken, additionalParams) {
     return method
         + '&' + percentEncode(url)
-        + '&' + percentEncode(genSortedParamStrForProtectedResource(key, timestamp, nonce, accessToken));
+        + '&' + percentEncode(genSortedParamStrForProtectedResource(key, timestamp, nonce, accessToken, additionalParams));
 }
 
-function genSortedParamStrForProtectedResource(key, timestamp, nonce, accessToken) {
+function genSortedParamStrForProtectedResource(key, timestamp, nonce, accessToken, additionalParams) {
     let paramObj = {
         oauth_consumer_key: key,
         oauth_nonce: nonce,
@@ -138,8 +138,11 @@ function genSortedParamStrForProtectedResource(key, timestamp, nonce, accessToke
         oauth_timestamp: timestamp,
         oauth_token: accessToken,
         oauth_version: '1.0'
-
     };
+
+    if (additionalParams) {
+        paramObj = {...paramObj, ...additionalParams};
+    }
     return encodeObjectToParamStr(paramObj)
 }
 
@@ -148,11 +151,11 @@ function genSortedParamStrForProtectedResource(key, timestamp, nonce, accessToke
  */
 
 function oAuthSigningKey(consumer_secret) {
-    return consumer_secret + '&';
+    return percentEncode(consumer_secret) + '&';
 }
 
 function oAuthSigningKeyWithAccessTokenScrect(consumer_secret, access_token_secret) {
-    return consumer_secret + '&' + access_token_secret;
+    return percentEncode(consumer_secret) + '&' + percentEncode(access_token_secret);
 }
 
 function oAuthSignature(base_string, signing_key) {
