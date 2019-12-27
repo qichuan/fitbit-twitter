@@ -14,6 +14,17 @@ import {twitterApi} from "../common/twitter_api";
 
 const FILE_NAME = "tweets.cbor";
 
+function clearAll() {
+    settingsStorage.setItem("oauth_access_token", "");
+    settingsStorage.setItem("oauth_access_token_secret", "");
+    localStorage.clear();
+
+    send({
+        what: 'loginStatus',
+        data: false
+    });
+}
+
 /////////////////////////////////////////////////
 // START OF EVENT TRIGGER CALLBACK IMPLEMENTATION
 /////////////////////////////////////////////////
@@ -21,14 +32,7 @@ settingsStorage.onchange = function (evt) {
     // When logout button is clicked 
     if (evt.key === 'invokeLogout') {
         console.log('Logout button is clicked');
-        settingsStorage.setItem("oauth_access_token", "");
-        settingsStorage.setItem("oauth_access_token_secret", "");
-        localStorage.clear();
-
-        send({
-            what: 'loginStatus',
-            data: false
-        });
+        clearAll();
 
     // Call the access token API when a new oauth verifier event arrives
     } else if (evt.key === 'oauth_verifier') {
@@ -128,6 +132,11 @@ function processHomeTimelineResult(jsonText) {
     const fullTweets = JSON.parse(jsonText);
     const imageArray = [];
     if (fullTweets) {
+        // If error encountered
+        if (fullTweets.errors) {
+            clearAll();
+            return;
+        }
         console.log(`${fullTweets.length} tweets received`);
         const simpleTweets = fullTweets.map((tweet, index) => {
             // Some unicode characters are not displayable in Fitbit devices, so we need to santize the text here

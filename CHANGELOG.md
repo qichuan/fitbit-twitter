@@ -1,3 +1,7 @@
+## [1.2.0] 26 Dec 2019
+- Add Like and Retweet buttons
+- Add event tracking for button events and screenviews
+
 ## [1.1.3] 11 Nov 2019
 - Support Versa 2
 

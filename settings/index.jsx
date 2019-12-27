@@ -84,9 +84,10 @@ function settingsComponent(props) {
                     </Text>}>
 
                 <Text>If you like this app and it has been useful to you, please consider buying me a coffee ☕️ :) </Text>
-                <Text bold>Visit: <Link source="https://www.paypal.me/QICHUAN">https://www.paypal.me/QICHUAN</Link> </Text>
+                <Text bold>Visit: <Link source="https://www.paypal.me/QICHUAN/5">https://www.paypal.me/QICHUAN</Link> </Text>
 
             </Section>
+            <Text>If you encounter problem in getting the your timeline, or the tweets that you like/retweet does not show up in your Twitter profile. Please try log out, then log in again. It should solve the problem most of the time</Text>
             <Text>App icon by <Link source="https://icons8.com">icons8</Link></Text>
         </Page>
     );

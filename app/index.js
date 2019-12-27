@@ -36,22 +36,30 @@ list.onlistbackward = evt => {
     updateComboButtonStatus();
 }
 
-function updateComboButtonStatus() {
-    const tweet = tweets[currentIndex];
-    likeButton.state = tweet.favorited ? "disabled" : "enabled";
-    retweetButton.state = tweet.retweeted ? "disabled" : "enabled";
-}
-
 // The welcome texts
 let welcomeLine1 = document.getElementById("welcome_line1");
 let welcomeLine2 = document.getElementById("welcome_line2");
 
-// The combo butons
+// The combo buttons
 let retweetButton = document.getElementById("btn-retweet");
 let likeButton = document.getElementById("btn-like");
 
+// The combo button initial status is disabled
 likeButton.state = "disabled";
 retweetButton.state = "disabled";
+
+let comboEnabled = false;
+
+function updateComboButtonStatus() {
+    const tweet = tweets[currentIndex];
+    if (comboEnabled) {
+        likeButton.state = tweet.favorited && comboEnabled ? "disabled" : "enabled";
+        retweetButton.state = tweet.retweeted && comboEnabled ? "disabled" : "enabled";
+    } else {
+        likeButton.state = "disabled";
+        retweetButton.state = "disabled";
+    }
+}
 
 likeButton.onactivate = evt => {
     // Update model
@@ -71,6 +79,14 @@ likeButton.onactivate = evt => {
         what: 'like',
         data: tweets[currentIndex].id
     });
+
+    // Send analytics data
+    analytics.send({
+        hit_type: "event",
+        event_category: "Display",
+        event_action: "Tap",
+        event_label: "Like"
+    });
 }
 
 retweetButton.onactivate = evt => {
@@ -84,6 +100,14 @@ retweetButton.onactivate = evt => {
     send({
         what: 'retweet',
         data: tweets[currentIndex].id
+    });
+
+     // Send analytics data
+     analytics.send({
+        hit_type: "event",
+        event_category: "Display",
+        event_action: "Tap",
+        event_label: "Retweet"
     });
 }
 
@@ -136,17 +160,25 @@ messaging.peerSocket.onmessage = function (evt) {
     if (message.what === 'loginStatus') {
         // Hide the welcome text if user has already logged in
         if (message.data) {
+            // Send analytics data
+            analytics.send({
+                hit_type: "screenview",
+                screen_name: "Main View"
+            });
+
             welcomeLine1.style.visibility = "hidden";
             welcomeLine2.style.visibility = "hidden";
             list.style.visibility = "visible";
-            likeButton.state = "enabled";
-            retweetButton.state = "enabled";
         } else {
+            // Send analytics data
+            analytics.send({
+                hit_type: "screenview",
+                screen_name: "Welcome View"
+            });
+
             welcomeLine1.style.visibility = "visible";
             welcomeLine2.style.visibility = "visible";
             list.style.visibility = "hidden";
-            likeButton.state = "disabled";
-            retweetButton.state = "disabled";
 
             // Delete tweets file and all avatar files
             const listDir = fs.listDirSync("/private/data");
@@ -188,6 +220,11 @@ inbox.onnewfile = () => {
                 const data = readTweetsFromFile(fileName);
                 if (data) {
                     setTweetListToTileList(data);
+                    // Enable the combo buttons only if the tweets are retrieved from remote server
+                    // Which means the Internet connectivity is most likely available for the app to 
+                    // send like and retweet requests
+                    comboEnabled = true;
+                    updateComboButtonStatus();
                 }
             }
         }
@@ -261,8 +298,6 @@ function setTweetListToTileList(tweetList) {
     list.delegate = listDelegate;
     list.length = tweetList.length;
     spinner.state = "disabled";
-    likeButton.state = "enabled";
-    retweetButton.state = "enabled";
 }
 
 /**
