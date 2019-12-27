@@ -48,10 +48,17 @@ let likeButton = document.getElementById("btn-like");
 likeButton.state = "disabled";
 retweetButton.state = "disabled";
 
+let comboEnabled = false;
+
 function updateComboButtonStatus() {
     const tweet = tweets[currentIndex];
-    likeButton.state = tweet.favorited ? "disabled" : "enabled";
-    retweetButton.state = tweet.retweeted ? "disabled" : "enabled";
+    if (comboEnabled) {
+        likeButton.state = tweet.favorited && comboEnabled ? "disabled" : "enabled";
+        retweetButton.state = tweet.retweeted && comboEnabled ? "disabled" : "enabled";
+    } else {
+        likeButton.state = "disabled";
+        retweetButton.state = "disabled";
+    }
 }
 
 likeButton.onactivate = evt => {
@@ -216,8 +223,8 @@ inbox.onnewfile = () => {
                     // Enable the combo buttons only if the tweets are retrieved from remote server
                     // Which means the Internet connectivity is most likely available for the app to 
                     // send like and retweet requests
-                    likeButton.state = "enabled";
-                    retweetButton.state = "enabled";
+                    comboEnabled = true;
+                    updateComboButtonStatus();
                 }
             }
         }
