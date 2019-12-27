@@ -36,22 +36,23 @@ list.onlistbackward = evt => {
     updateComboButtonStatus();
 }
 
+// The welcome texts
+let welcomeLine1 = document.getElementById("welcome_line1");
+let welcomeLine2 = document.getElementById("welcome_line2");
+
+// The combo buttons
+let retweetButton = document.getElementById("btn-retweet");
+let likeButton = document.getElementById("btn-like");
+
+// The combo button initial status is disabled
+likeButton.state = "disabled";
+retweetButton.state = "disabled";
+
 function updateComboButtonStatus() {
     const tweet = tweets[currentIndex];
     likeButton.state = tweet.favorited ? "disabled" : "enabled";
     retweetButton.state = tweet.retweeted ? "disabled" : "enabled";
 }
-
-// The welcome texts
-let welcomeLine1 = document.getElementById("welcome_line1");
-let welcomeLine2 = document.getElementById("welcome_line2");
-
-// The combo butons
-let retweetButton = document.getElementById("btn-retweet");
-let likeButton = document.getElementById("btn-like");
-
-likeButton.state = "disabled";
-retweetButton.state = "disabled";
 
 likeButton.onactivate = evt => {
     // Update model
@@ -171,8 +172,6 @@ messaging.peerSocket.onmessage = function (evt) {
             welcomeLine1.style.visibility = "visible";
             welcomeLine2.style.visibility = "visible";
             list.style.visibility = "hidden";
-            likeButton.state = "disabled";
-            retweetButton.state = "disabled";
 
             // Delete tweets file and all avatar files
             const listDir = fs.listDirSync("/private/data");
@@ -214,6 +213,11 @@ inbox.onnewfile = () => {
                 const data = readTweetsFromFile(fileName);
                 if (data) {
                     setTweetListToTileList(data);
+                    // Enable the combo buttons only if the tweets are retrieved from remote server
+                    // Which means the Internet connectivity is most likely available for the app to 
+                    // send like and retweet requests
+                    likeButton.state = "enabled";
+                    retweetButton.state = "enabled";
                 }
             }
         }
@@ -287,8 +291,6 @@ function setTweetListToTileList(tweetList) {
     list.delegate = listDelegate;
     list.length = tweetList.length;
     spinner.state = "disabled";
-    likeButton.state = "enabled";
-    retweetButton.state = "enabled";
 }
 
 /**
