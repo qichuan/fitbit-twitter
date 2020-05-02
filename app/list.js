@@ -17,10 +17,42 @@ function setOnCollapseCallback(callback) {
   onCollapse = callback;
 }
 
+function expand(tile) {
+  const textinstance = tile.getElementById("textInstance");
+  textinstance.animate("disable");
+  textinstance.getElementById("textarea").class = "fullText";
+
+  // Hide other UI elements
+  tile.getElementById("avatar").style.display = "none";
+  tile.getElementById("fullname").style.display = "none";
+  tile.getElementById("author").style.display = "none";
+  tile.getElementById("footer").style.display = "none";
+  onExpand();
+  tile.isExpanded = true;
+}
+
+function collapse(tile) {
+  const textinstance = tile.getElementById("textInstance");
+  textinstance.animate("enable");
+  reset(tile);
+  onCollapse();
+  tile.isExpanded = false;
+}
+
+function reset(tile) {
+  tile.isExpanded = false;
+  const textinstance = tile.getElementById("textInstance");
+  textinstance.getElementById("textarea").class = "digest";
+  // SHow other UI elements
+  tile.getElementById("avatar").style.display = "inline";
+  tile.getElementById("fullname").style.display = "inline";
+  tile.getElementById("author").style.display = "inline";
+  tile.getElementById("footer").style.display = "inline";
+}
+
 // List delegate to bind the view models to the tile list
 const delegate = {
   getTileInfo: function (index) {
-    console.log(JSON.stringify(tweets[index]));
     return {
       type: "my-pool",
       value: tweets[index],
@@ -30,6 +62,7 @@ const delegate = {
   configureTile: function (tile, info) {
     if (info.type == "my-pool") {
       if (info.value) {
+        reset(tile);
         tile.getElementById(
           "avatar"
         ).image = `/private/data/avatar_${info.value.author}.jpg`;
@@ -38,45 +71,16 @@ const delegate = {
         tile.getElementById("textInstance").getElementById("textarea").text =
           info.value.text;
         utils.updateFooter(tile.getElementById("footer"), info.value);
-        tile.isShown = true;
+        tile.getElementById("touch-me").onclick = (evt) => {
+          setTimeout(function () {
+            if (tile.isExpanded) {
+              collapse(tile);
+            } else {
+              expand(tile);
+            }
+          }, 100);
+        };
       }
-
-      let touch = tile.getElementById("touch-me");
-      touch.onclick = (evt) => {
-        console.log(`touched: ${info.index}`);
-
-        // Get a handle on the instance
-
-        const textinstance = tile.getElementById("textInstance");
-
-        setTimeout(function () {
-          if (tile.isShown) {
-            textinstance.animate("disable");
-
-            textinstance.getElementById("textarea").class = "fullText";
-
-            // Hide other UI elements
-            tile.getElementById("avatar").style.display = "none";
-            tile.getElementById("fullname").style.display = "none";
-            tile.getElementById("author").style.display = "none";
-            tile.getElementById("footer").style.display = "none";
-            onExpand();
-            tile.isShown = false;
-          } else {
-            textinstance.animate("enable");
-
-            textinstance.getElementById("textarea").class = "digest";
-
-            // SHow other UI elements
-            tile.getElementById("avatar").style.display = "inline";
-            tile.getElementById("fullname").style.display = "inline";
-            tile.getElementById("author").style.display = "inline";
-            tile.getElementById("footer").style.display = "inline";
-            onCollapse();
-            tile.isShown = true;
-          }
-        }, 100);
-      };
     }
   },
 };
