@@ -3,7 +3,6 @@ import document from "document";
 import * as messaging from "messaging";
 import { inbox } from "file-transfer";
 import fs from "fs";
-import { listDirSync } from "fs";
 
 // Import external 3rd party library
 import analytics from "fitbit-google-analytics/app";

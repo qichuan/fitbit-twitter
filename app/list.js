@@ -42,15 +42,12 @@ function collapse(tile) {
     textinstance.getElementById("textarea").class = "digest";
   }, 300);
 
-  reset(tile);
+  resetUI(tile);
   onCollapse();
   tile.isExpanded = false;
 }
 
-function reset(tile) {
-  tile.isExpanded = false;
-  const textinstance = tile.getElementById("textInstance");
-  textinstance.getElementById("textarea").class = "digest";
+function resetUI(tile) {
   // SHow other UI elements
   tile.getElementById("avatar").style.display = "inline";
   tile.getElementById("fullname").style.display = "inline";
@@ -70,7 +67,11 @@ const delegate = {
   configureTile: function (tile, info) {
     if (info.type == "my-pool") {
       if (info.value) {
-        reset(tile);
+        // reset the flag and style
+        tile.isExpanded = false;
+        const textinstance = tile.getElementById("textInstance");
+        textinstance.getElementById("textarea").class = "digest";
+        resetUI(tile);
         tile.getElementById(
           "avatar"
         ).image = `/private/data/avatar_${info.value.author}.jpg`;
