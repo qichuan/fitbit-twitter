@@ -40,10 +40,10 @@ function collapse(tile) {
   // Change class after the animation is played
   setTimeout(() => {
     textinstance.getElementById("textarea").class = "digest";
+    resetUI(tile);
+    onCollapse();
   }, 300);
 
-  resetUI(tile);
-  onCollapse();
   tile.isExpanded = false;
 }
 
