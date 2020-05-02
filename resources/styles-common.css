@@ -35,27 +35,6 @@
   text-anchor: start;
 }
 
-.digest {
-  x: 5;
-  y: 65;
-  width: 100%-10;
-  font-size: 26;
-  fill: white;
-  rows: 6;
-  text-length: 256;
-  text-overflow: ellipsis;
-}
-
-.fullText {
-  x: 5;
-  y: 65;
-  width: 100%-10;
-  font-size: 26;
-  fill: white;
-  rows: 9;
-  text-length: 512;
-}
-
 .footer {
   x: 5;
   y: 100%-24;

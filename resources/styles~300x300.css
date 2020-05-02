@@ -1,3 +1,24 @@
 .tile-list-item {
   height: 300;
 }
+
+.digest {
+  x: 5;
+  y: 55;
+  width: 100%-10;
+  font-size: 26;
+  fill: white;
+  rows: 6;
+  text-length: 256;
+  text-overflow: ellipsis;
+}
+
+.fullText {
+  x: 5;
+  y: 55;
+  width: 100%-10;
+  font-size: 26;
+  fill: white;
+  rows: 10;
+  text-length: 512;
+}
