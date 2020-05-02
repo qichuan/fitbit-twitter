@@ -8,7 +8,12 @@ Downloadable from Fitbit App Gallary at [https://gam.fitbit.com/gallery/app/3344
 # Prerequisites
 
 - [Register](https://developer.twitter.com) a Twitter developer account
-- [Create](https://developer.twitter.com/en/apps) a Twitter app to obatin a pair of `consumerKey` and `consumerSecret`
+- [Create](https://developer.twitter.com/en/apps) a Twitter app 
+- In App Details tab, set the Callback URL
+ to `https://app-settings.fitbitdevelopercontent.com/simple-redirect.html
+`
+- In Permissions tan, change the Access Permission to both Read and write
+- In Keys and tokens tab, obtain a pair of `consumerKey` and `consumerSecret`
 - Set the `consumerKey` and `consumerSecret` in `/companion/common.js`
 
 # Getting started
