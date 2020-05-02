@@ -46,13 +46,14 @@ const delegate = {
         console.log(`touched: ${info.index}`);
 
         // Get a handle on the instance
-        const demoinstance = tile.getElementById("demoinstance");
+
         const textinstance = tile.getElementById("textInstance");
 
         setTimeout(function () {
           if (tile.isShown) {
-            demoinstance.animate("disable");
             textinstance.animate("disable");
+
+            textinstance.getElementById("textarea").class = "fullText";
 
             // Hide other UI elements
             tile.getElementById("avatar").style.display = "none";
@@ -62,8 +63,9 @@ const delegate = {
             onExpand();
             tile.isShown = false;
           } else {
-            demoinstance.animate("enable");
             textinstance.animate("enable");
+
+            textinstance.getElementById("textarea").class = "digest";
 
             // SHow other UI elements
             tile.getElementById("avatar").style.display = "inline";

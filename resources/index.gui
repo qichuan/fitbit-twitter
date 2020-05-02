@@ -4,9 +4,6 @@
     <symbol id="my-tile-item" href="#tile-list-item" focusable="false"
             pointer-events="none" system-events="all" display="none">
       
-      <svg width="100%" height="100%">
-        <use id="demoinstance" href="#demo" width="100%" height="100%" />
-      </svg>
       <!-- The avatar -->
       <image id="avatar" class="avatar"/>
 

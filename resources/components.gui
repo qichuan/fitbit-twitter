@@ -1,28 +1,7 @@
 <svg>
   <defs>
-    <symbol id="demo">
-      <g id="demogroup">
-        <circle cx="50%" cy="50%" r="50" fill="red" />
-        <animate attributeName="opacity" begin="disable"
-            from="1" to="0" dur="1" final="keep" />
-        <animate attributeName="opacity" begin="enable"
-            from="0" to="1" dur="1" final="keep" />
-      </g>
-    </symbol>
     <!-- Animated UIs-->
-
-    <!-- Avatar-->
-    <symbol id="avatar">
-      <g id="avatarGroup">
-        <image id="avatarImg" class="avatar"/>
-        <animateTransform attributeType="translate" begin="disable"
-            from="45,50%" to="100%-45,50%" dur="1" final="keep" />
-        <animateTransform attributeType="translate" begin="enable"
-            to="45,50%" from="100%-45,50%" dur="1" final="keep" />
-      </g>
-    </symbol>
-
-     <!-- FullText-->
+    <!-- FullText-->
     <symbol id="text">
       <g id="textGroup">
         <textarea id="textarea" class="digest"/>
