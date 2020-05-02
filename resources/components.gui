@@ -5,10 +5,10 @@
     <symbol id="text">
       <g id="textGroup">
         <textarea id="textarea" class="digest"/>
-        <animateTransform attributeType="translate" begin="disable"
-            from="0,0" to="0,-55" dur="0.3" final="keep" />
         <animateTransform attributeType="translate" begin="enable"
-            to="0,0" from="0,-55" dur="0.3" final="keep" />
+            from="0,0" to="0,-50" dur="0.3" final="restore" />
+        <animateTransform attributeType="translate" begin="disable"
+            to="0,0" from="0,-50" dur="0.3" final="restore" />
       </g>
     </symbol>
     

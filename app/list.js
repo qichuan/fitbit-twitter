@@ -19,8 +19,11 @@ function setOnCollapseCallback(callback) {
 
 function expand(tile) {
   const textinstance = tile.getElementById("textInstance");
-  textinstance.animate("disable");
-  textinstance.getElementById("textarea").class = "fullText";
+  textinstance.animate("enable");
+  // Change class after the animation is played
+  setTimeout(() => {
+    textinstance.getElementById("textarea").class = "fullText";
+  }, 300);
 
   // Hide other UI elements
   tile.getElementById("avatar").style.display = "none";
@@ -33,7 +36,12 @@ function expand(tile) {
 
 function collapse(tile) {
   const textinstance = tile.getElementById("textInstance");
-  textinstance.animate("enable");
+  textinstance.animate("disable");
+  // Change class after the animation is played
+  setTimeout(() => {
+    textinstance.getElementById("textarea").class = "digest";
+  }, 300);
+
   reset(tile);
   onCollapse();
   tile.isExpanded = false;
