@@ -1,0 +1,16 @@
+<svg>
+  <defs>
+    <!-- Animated UIs-->
+    <!-- FullText-->
+    <symbol id="text">
+      <g id="textGroup">
+        <textarea id="textarea" class="digest"/>
+        <animateTransform attributeType="translate" begin="enable"
+            from="0,0" to="0,-50" dur="0.3" final="restore" />
+        <animateTransform attributeType="translate" begin="disable"
+            to="0,50" from="0,0" dur="0.3" final="restore" />
+      </g>
+    </symbol>
+    
+  </defs>
+</svg>
