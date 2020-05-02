@@ -8,8 +8,9 @@ import { listDirSync } from "fs";
 // Import external 3rd party library
 import analytics from "fitbit-google-analytics/app";
 
-// Import common utils
-import { utils } from "../common/utils";
+// Import UI utils
+import { utils } from "./utils";
+import { listManager } from "./list";
 
 ///////////////////////////////////////////////
 // START OF THE MAIN PROCEDURE
@@ -70,7 +71,7 @@ likeButton.onactivate = (evt) => {
   // Update view
   document.getElementsByClassName("footer").forEach((element) => {
     if (element.tweetId === tweets[currentIndex].id) {
-      updateFooter(element, tweets[currentIndex]);
+      utils.updateFooter(element, tweets[currentIndex]);
     }
   });
   updateComboButtonStatus();
@@ -236,87 +237,6 @@ inbox.onnewfile = () => {
 /////////////////////////////////////////////////
 
 /**
- * Update the footer text element with the tweet object
- * @param element the footer text element
- * @param tweet the data object
- */
-function updateFooter(element, tweet) {
-  element.tweetId = tweet.id;
-  element.text = `❤️ ${tweet.likes} · ${utils.prettyDate(tweet.createdTime)}`;
-}
-
-// List delegate to bind the view models to the tile list
-const listDelegate = {
-  getTileInfo: function (index) {
-    return {
-      type: "my-pool",
-      value: tweets[index],
-      index: index,
-    };
-  },
-  configureTile: function (tile, info) {
-    if (info.type == "my-pool") {
-      if (info.value) {
-        tile.getElementById(
-          "avatar"
-        ).image = `/private/data/avatar_${info.value.author}.jpg`;
-        tile.getElementById("fullname").text = info.value.fullName;
-        tile.getElementById("author").text = `@${info.value.author}`;
-        tile.getElementById("textInstance").getElementById("textarea").text =
-          info.value.text;
-        updateFooter(tile.getElementById("footer"), info.value);
-        tile.isShown = true;
-      }
-
-      let touch = tile.getElementById("touch-me");
-      touch.onclick = (evt) => {
-        console.log(`touched: ${info.index}`);
-
-        // Get a handle on the instance
-        const demoinstance = tile.getElementById("demoinstance");
-        const textinstance = tile.getElementById("textInstance");
-
-        setTimeout(function () {
-          if (tile.isShown) {
-            demoinstance.animate("disable");
-            textinstance.animate("disable");
-
-            // Hide other UI elements
-            tile.getElementById("avatar").style.display = "none";
-            tile.getElementById("fullname").style.display = "none";
-            tile.getElementById("author").style.display = "none";
-            tile.getElementById("footer").style.display = "none";
-            likeButton.style.display = "none";
-            retweetButton.style.display = "none";
-            tile.isShown = false;
-          } else {
-            demoinstance.animate("enable");
-            textinstance.animate("enable");
-
-            // SHow other UI elements
-            tile.getElementById("avatar").style.display = "inline";
-            tile.getElementById("fullname").style.display = "inline";
-            tile.getElementById("author").style.display = "inline";
-            tile.getElementById("footer").style.display = "inline";
-            likeButton.style.display = "inline";
-            retweetButton.style.display = "inline";
-            tile.isShown = true;
-          }
-        }, 100);
-
-        // tile.getElementById("text").text = info.value.text;
-      };
-    }
-  },
-
-  displayFullText: function (tile) {
-    tile.getElementById("fullname").style.height = 0;
-    tile.getElementById("author").style.height = 0;
-    tile.getElementById("footer").style.height = 0;
-  },
-};
-
-/**
  * Read the tweets from given local file if any.
  *
  * @param {string} fileName the file to be read
@@ -339,7 +259,20 @@ function readTweetsFromFile(fileName) {
  */
 function setTweetListToTileList(tweetList) {
   tweets = tweetList;
-  list.delegate = listDelegate;
+
+  // Configure the delegate
+  listManager.setTweets(tweets);
+  listManager.setOnExpandCallback(() => {
+    likeButton.style.display = "none";
+    retweetButton.style.display = "none";
+  });
+  listManager.setOnCollapseCallback(() => {
+    likeButton.style.display = "inline";
+    retweetButton.style.display = "inline";
+  });
+
+  // Set the delgate
+  list.delegate = listManager.delegate;
   list.length = tweetList.length;
   spinner.state = "disabled";
 }
