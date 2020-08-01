@@ -199,6 +199,7 @@ function simplifyFromOrigianlTweet(tweet) {
     author: tweet.user.screen_name,
     fullName: tweet.user.name,
     likes: tweet.favorite_count,
+    retweets: tweet.retweet_count,
     favorited: tweet.favorited,
     retweeted: tweet.retweeted,
   };

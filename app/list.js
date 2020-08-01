@@ -75,7 +75,8 @@ const delegate = {
         tile.getElementById(
           "avatar"
         ).image = `/private/data/avatar_${info.value.author}.jpg`;
-        tile.getElementById("fullname").text = info.value.fullName;
+        tile.getElementById("fullname").text =
+          (info.value.isRetweeted ? "RT " : "") + info.value.fullName;
         tile.getElementById("author").text = `@${info.value.author}`;
         tile.getElementById("textInstance").getElementById("textarea").text =
           info.value.text;

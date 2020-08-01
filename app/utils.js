@@ -5,7 +5,9 @@
  */
 function updateFooter(element, tweet) {
   element.tweetId = tweet.id;
-  element.text = `❤️ ${tweet.likes} · ${prettyDate(tweet.createdTime)}`;
+  element.text = `❤️ ${tweet.likes} · RT ${tweet.retweets} · ${prettyDate(
+    tweet.createdTime
+  )}`;
 }
 
 /**
