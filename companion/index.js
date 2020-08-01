@@ -138,7 +138,6 @@ function loadTweets() {
  */
 function processHomeTimelineResult(jsonText) {
   const fullTweets = JSON.parse(jsonText);
-  const imageArray = [];
   if (fullTweets) {
     // If error encountered
     if (fullTweets.errors) {
@@ -147,60 +146,67 @@ function processHomeTimelineResult(jsonText) {
     }
     console.log(`${fullTweets.length} tweets received`);
     const simpleTweets = fullTweets.map((tweet, index) => {
-      // Some unicode characters are not displayable in Fitbit devices, so we need to santize the text here
-      let sanitizedText = tweet.full_text
-        .split("")
-        .map(function (value, index) {
-          if (value.charCodeAt(0) >= 55300) {
-            return " ";
-          }
-          return value;
-        })
-        .join("");
-
-      const found = sanitizedText.indexOf("https://t.co/");
-      if (found > 0) {
-        sanitizedText = sanitizedText.substring(0, found);
+      if (tweet.retweeted_status) {
+        const simpleTweet = simplifyFromOrigianlTweet(tweet.retweeted_status);
+        simpleTweet.isRetweeted = true;
+        simpleTweet.originalAuthor = tweet.user.name;
+        fetchAndTransferImageFile(tweet.retweeted_status);
+        return simpleTweet;
       }
-
-      // Load the media image
-      // if (tweet.entities.media) {
-      //     fetchAndTranferImageFile(tweet.entities.media[0].media_url_https+':thumb', tweet.id + '.jpg');
-      // }
-
-      // Convert the date string to time long value
-      const createdTime = new Date(
-        (tweet.created_at || "").replace(/-/g, "/").replace(/[TZ]/g, " ")
-      ).getTime();
-
-      imageArray.push({
-        imageUrl: tweet.user.profile_image_url_https,
-        destFilename: `avatar_${tweet.user.screen_name}.jpg`,
-      });
-
-      // Return only the necessary data to app
-      return {
-        id: tweet.id_str,
-        text: sanitizedText,
-        createdTime: createdTime,
-        author: tweet.user.screen_name,
-        fullName: tweet.user.name,
-        likes: tweet.favorite_count,
-        favorited: tweet.favorited,
-        retweeted: tweet.retweeted,
-      };
+      fetchAndTransferImageFile(tweet);
+      return simplifyFromOrigianlTweet(tweet);
     });
+
     // Transfer the tweets to the app
     outbox.enqueue(FILE_NAME, cbor.encode(simpleTweets));
-
-    // Load the avatar images
-    for (var item of imageArray) {
-      fetchAndTransferImageFile(item.imageUrl, item.destFilename);
-    }
   }
 }
 
-function fetchAndTransferImageFile(imageUrl, destFilename) {
+function fetchImage(tweet) {}
+
+function simplifyFromOrigianlTweet(tweet) {
+  // Some unicode characters are not displayable in Fitbit devices, so we need to santize the text here
+  let sanitizedText = tweet.full_text
+    .split("")
+    .map(function (value, index) {
+      if (value.charCodeAt(0) >= 55300) {
+        return " ";
+      }
+      return value;
+    })
+    .join("");
+
+  const found = sanitizedText.indexOf("https://t.co/");
+  if (found > 0) {
+    sanitizedText = sanitizedText.substring(0, found);
+  }
+
+  // Load the media image
+  // if (tweet.entities.media) {
+  //     fetchAndTranferImageFile(tweet.entities.media[0].media_url_https+':thumb', tweet.id + '.jpg');
+  // }
+
+  // Convert the date string to time long value
+  const createdTime = new Date(
+    (tweet.created_at || "").replace(/-/g, "/").replace(/[TZ]/g, " ")
+  ).getTime();
+
+  // Return only the necessary data to app
+  return {
+    id: tweet.id_str,
+    text: sanitizedText,
+    createdTime: createdTime,
+    author: tweet.user.screen_name,
+    fullName: tweet.user.name,
+    likes: tweet.favorite_count,
+    favorited: tweet.favorited,
+    retweeted: tweet.retweeted,
+  };
+}
+
+function fetchAndTransferImageFile(tweet) {
+  const imageUrl = tweet.user.profile_image_url_https;
+  const destFilename = `avatar_${tweet.user.screen_name}.jpg`;
   // Do not fetch if the image has already been fetched before
   if (localStorage.getItem(destFilename)) {
     return;
