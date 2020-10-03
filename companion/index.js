@@ -1,7 +1,7 @@
 // Import Fitbit SDK libraries
 import { settingsStorage } from "settings";
 import { outbox } from "file-transfer";
-import cbor from "cbor";
+import { cbor } from "./cbor";
 import * as messaging from "messaging";
 import { Image } from "image";
 import { localStorage } from "local-storage";
