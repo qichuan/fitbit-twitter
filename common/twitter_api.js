@@ -10,7 +10,7 @@ const retweetUrl = "https://api.twitter.com/1.1/statuses/retweet/:id.json";
 
 function getRequestToken(newCallbackUrl, callback) {
   // Use this proxy to bypass the cross-origin restriction in the settings page
-  fetch("https://cors-anywhere.herokuapp.com/" + requestTokenUrl, {
+  fetch("https://dawn-sky-10e1.qichuan.workers.dev/?" + requestTokenUrl, {
     method: "POST",
     headers: {
       Authorization: twitterOAuth.getAuthorizationForRequestToken(
