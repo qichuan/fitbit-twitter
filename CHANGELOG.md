@@ -1,3 +1,7 @@
+## [1.3.2] 17 Feb 2021
+
+- Fix login issue
+
 ## [1.3.0] 2 May 2020
 
 - Add Click to view in full text
